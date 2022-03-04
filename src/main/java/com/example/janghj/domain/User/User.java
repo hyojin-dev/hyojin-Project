@@ -1,20 +1,17 @@
 package com.example.janghj.domain.User;
 
 import com.example.janghj.domain.Address;
-import com.example.janghj.domain.Timestamped;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.*;
 
 @NoArgsConstructor
-@Setter
 @Getter
 @Entity
-public class User extends Timestamped {
+public class User {
 
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Id
@@ -24,7 +21,6 @@ public class User extends Timestamped {
 
     @Column(nullable = true)
     private Long kakaoId;
-
 
     @Column(nullable = false)
     private String username;
@@ -58,5 +54,9 @@ public class User extends Timestamped {
         this.password = password;
         this.email = email;
         this.role = role;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
     }
 }

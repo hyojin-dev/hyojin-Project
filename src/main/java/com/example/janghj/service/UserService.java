@@ -3,6 +3,7 @@ package com.example.janghj.service;
 import com.example.janghj.config.security.UserDetailsImpl;
 import com.example.janghj.config.security.kakao.KakaoOAuth2;
 import com.example.janghj.config.security.kakao.KakaoUserInfo;
+import com.example.janghj.domain.Address;
 import com.example.janghj.domain.User.User;
 import com.example.janghj.domain.User.UserRole;
 import com.example.janghj.repository.UserRepository;
@@ -29,12 +30,10 @@ public class UserService {
     private final KakaoOAuth2 kakaoOAuth2;
     private final AuthenticationManager authenticationManager;
 
-    public void deleteUser(UserDetailsImpl nowUser) {
-        userRepository.deleteById(nowUser.getUser().getId());
-    }
 
     public User registerUser(UserDto userDto) {
-        User user = User.builder().username(userDto.getUsername())
+        User user = User.builder()
+                .username(userDto.getUsername())
                 .password(passwordEncoder.encode(userDto.getPassword()))
                 .email(userDto.getEmail())
                 .role(UserRole.USER)
@@ -44,9 +43,21 @@ public class UserService {
         return user;
     }
 
+    public Boolean checkExist(String username) {
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isPresent()) {
+            return true;
+        }
+        return false;
+    }
+
+    public void deleteUser(Long userId) {
+        userRepository.deleteById(userId);
+    }
+
     public boolean confirmPassword(UserDto userDto) {
         User user = userRepository.findByUsername(userDto.getUsername()).orElseThrow(
-                () -> new NullPointerException("해당 사용자가 없습니다. 유저아이디 = " + userDto.getUsername())
+                () -> new NullPointerException("해당 사용자가 없습니다. userId = " + userDto.getUsername())
         );
         if (!passwordEncoder.matches(userDto.getPassword(), user.getPassword())) {
             return true;
@@ -54,21 +65,11 @@ public class UserService {
         return false;
     }
 
-    public void checkExist(UserDto userDto) {
-        // 회원 ID 중복 확인
-        Optional<User> user = userRepository.findByUsername(userDto.getUsername());
-
-        if (user.isPresent()) {
-            throw new IllegalArgumentException("사용자가 존재합니다. 유저아이디 = " + userDto.getUsername());
-
-        }
-    }
-
     @Transactional
-    public User updateProfile(UserDetailsImpl nowUser) throws IOException {
+    public User userSetAddress(UserDetailsImpl nowUser, Address address) throws IOException {
         User user = userRepository.findById(nowUser.getId()).orElseThrow(
-                () -> new NullPointerException("해당 사용자가 없습니다. id=" + nowUser.getId()));
-
+                () -> new NullPointerException("해당 사용자가 없습니다. userId =" + nowUser.getId()));
+        user.setAddress(address);
         userRepository.save(user);
         return user;
     }

@@ -2,20 +2,19 @@ package com.example.janghj.web;
 
 import com.example.janghj.config.jwt.JwtTokenUtil;
 import com.example.janghj.config.security.UserDetailsImpl;
+import com.example.janghj.domain.Address;
 import com.example.janghj.domain.User.User;
 import com.example.janghj.service.UserService;
 import com.example.janghj.web.dto.JwtTokenDto;
 import com.example.janghj.web.dto.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -27,11 +26,27 @@ public class UserApiController {
     private final UserDetailsService userDetailsService;
     private final UserService userService;
 
+    @Operation(description = "회원가입 시 아이디 유효성 검사", method = "GET")
+    @GetMapping("/user/signup/check")
+    public ResponseEntity<?> checkUser(@RequestBody UserDto userDto) {
+        if (userService.checkExist(userDto.getUsername())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } else {
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+    }
+
     @Operation(description = "회원가입", method = "POST")
     @PostMapping("/user/signup")
     public String createUser(@RequestBody UserDto userDto) throws Exception {
         userService.registerUser(userDto);
         return "'" + userDto.getUsername() + "'님 회원가입을 축하드립니다!";
+    }
+
+    @Operation(description = "유저 삭제", method = "DELETE")
+    @DeleteMapping("/user")
+    public void deleteUser(@AuthenticationPrincipal UserDetailsImpl nowUser) {
+        userService.deleteUser(nowUser.getUser().getId());
     }
 
     @Operation(description = "로그인", method = "POST")
@@ -45,37 +60,14 @@ public class UserApiController {
         return ResponseEntity.ok(new JwtTokenDto(token, userDetails.getUsername()));
     }
 
-    @Operation(description = "회원가입 시 아이디 유효성 검사", method = "POST")
-    @PostMapping("/user/signup/check")
-    public String checkUser(@RequestBody UserDto userDto) {
-        JSONObject response = new JSONObject();
-        try {
-            userService.checkExist(userDto);
-        } catch (IllegalArgumentException e) {
-            response.put("exists", Boolean.TRUE);
-            return response.toString();
-        }
-        response.put("exists", Boolean.FALSE);
-        return response.toString();
-    }
-
-    @Operation(description = "프로필 설정, 로그인 필요", method = "POST")
-    @PostMapping("/user")
-    public User updateProfile(@RequestPart(required = false) String nickname,
-                              @RequestPart(name = "profileImgUrl", required = false) MultipartFile multipartFile,
-                              @AuthenticationPrincipal UserDetailsImpl nowUser) throws IOException {
-        return userService.updateProfile(nowUser);
-    }
-
-    @Operation(description = "유저 삭제", method = "DELETE")
-    @DeleteMapping("/user")
-    public void deleteUser(@AuthenticationPrincipal UserDetailsImpl nowUser) {
-        userService.deleteUser(nowUser);
+    @Operation(description = "유저 주소 설정, 로그인 필요", method = "PUT")
+    @PutMapping("/user")
+    public User updateProfile(@AuthenticationPrincipal UserDetailsImpl nowUser, @RequestBody Address address) throws IOException {
+        return userService.userSetAddress(nowUser, address);
     }
 
     @GetMapping("/user/kakao/callback")
     public String kakaoLogin(String code) {
-        // authorizedCode: 카카오 서버로부터 받은 인가 코드
         userService.kakaoLogin(code);
         return "redirect:/";
     }

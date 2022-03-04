@@ -49,6 +49,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/h2-console").permitAll()
                 .antMatchers("/h2-console/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/user/signup").permitAll()
+                .antMatchers(HttpMethod.GET, "/user/signup/check").permitAll()
+                .antMatchers(HttpMethod.PUT, "/user").permitAll()
                 .antMatchers("/user/kakao/callback").permitAll()
 
                 // 그 외 모든 요청은 인증과정 필요
