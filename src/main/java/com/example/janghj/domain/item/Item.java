@@ -1,9 +1,16 @@
 package com.example.janghj.domain.item;
 
 import com.example.janghj.domain.Timestamped;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name="dtype")
+@Getter
+@Setter
 public abstract class Item extends Timestamped {
 
     @Id
@@ -22,5 +29,5 @@ public abstract class Item extends Timestamped {
 
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
-    private Color color;
+    private ItemColor color;
 }

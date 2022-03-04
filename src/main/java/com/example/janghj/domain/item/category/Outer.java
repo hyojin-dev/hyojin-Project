@@ -1,4 +1,14 @@
 package com.example.janghj.domain.item.category;
 
-public class Outer {
+import com.example.janghj.domain.item.Item;
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.persistence.Entity;
+
+//@DiscriminatorValue("")
+@Entity
+@Getter
+@Setter
+public class Outer extends Item {
 }

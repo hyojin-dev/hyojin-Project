@@ -1,12 +1,15 @@
 package com.example.janghj.domain.User;
 
 import com.example.janghj.domain.Address;
+import com.example.janghj.domain.Delivery;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+
+import static javax.persistence.FetchType.LAZY;
 
 @NoArgsConstructor
 @Getter
@@ -16,7 +19,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Id
     // 반드시 값을 가지도록 합니다.
-    @Column(name = "USER_ID")
+    @Column(name = "user_id")
     private Long id;
 
     @Column(nullable = true)
@@ -38,6 +41,12 @@ public class User {
 
     @Embedded
     private Address address;
+
+    @JsonIgnore
+    @OneToOne(fetch = LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "mileage_id")
+    private UserMileage userMileage;
+
 
     @Builder
     public User(String username, String password, String email, UserRole role, Address address) {

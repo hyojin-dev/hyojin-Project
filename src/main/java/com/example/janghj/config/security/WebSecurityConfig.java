@@ -43,18 +43,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors();
 
         http.authorizeRequests()
-                // 인증과정 필요 없이 허용
-//                .antMatchers("/bootstrap-tagsinput.css").permitAll()
+//                인증 과정 필요 없음
+//                .antMatchers(HttpMethod.POST, "/..").permitAll()
+//                인증 과정 필요함
+//                .antMatchers(HttpMethod.GET, "/..").authenticated()
 //                .antMatchers("/bootstrap-tagsinput.js").permitAll()
-                .antMatchers("/h2-console").permitAll()
-                .antMatchers("/h2-console/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/user/signup").permitAll()
-                .antMatchers(HttpMethod.GET, "/user/signup/check").permitAll()
-                .antMatchers(HttpMethod.PUT, "/user").permitAll()
-                .antMatchers("/user/kakao/callback").permitAll()
 
                 // 그 외 모든 요청은 인증과정 필요
-                .anyRequest().authenticated()
+                // .anyRequest().authenticated()
+                // 그 외 모든 요청은 허용
+                .anyRequest().permitAll()
                 .and()
                 // 정상적인 토큰이 없을 경우
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
