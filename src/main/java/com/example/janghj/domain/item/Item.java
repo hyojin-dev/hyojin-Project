@@ -8,7 +8,8 @@ import javax.persistence.*;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name="dtype")
+// 부모 테이블을 구분할 구분자 컬럼이름을 지어준다.
+@DiscriminatorColumn(name="DTYPE")
 @Getter
 @Setter
 public abstract class Item extends Timestamped {
