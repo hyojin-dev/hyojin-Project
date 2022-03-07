@@ -11,6 +11,8 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.util.List;
 
+import static javax.persistence.FetchType.LAZY;
+
 @Setter
 @Getter
 @NoArgsConstructor
@@ -28,7 +30,7 @@ public class ChatRoom extends Timestamped {
     private int count;
 
     @JoinColumn(name = "USER_ID")
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     private User user; //룸 개설자
 
     @JsonIgnore

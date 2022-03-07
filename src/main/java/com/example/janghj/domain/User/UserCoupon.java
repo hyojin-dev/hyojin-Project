@@ -1,16 +1,31 @@
 package com.example.janghj.domain.User;
 
+import com.example.janghj.domain.Timestamped;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+
 import javax.persistence.*;
 
-@Entity
-public class UserCoupon {
+import static javax.persistence.FetchType.LAZY;
 
-    @GeneratedValue(strategy = GenerationType.AUTO)
+@Entity
+@Getter
+public class UserCoupon extends Timestamped {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     // 반드시 값을 가지도록 합니다.
-    @Column(name = "user_coupon_id")
+    @Column(name = "coupon_id")
     private Long id;
 
+    @Column(nullable = false)
     private String couponName;
-    private int RATE_DISCOUNT;
+
+    @Column(nullable = false)
+    private int RateDiscount;
+
+    @JsonIgnore
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 }

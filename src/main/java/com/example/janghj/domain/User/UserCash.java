@@ -11,11 +11,10 @@ import static javax.persistence.FetchType.LAZY;
 @Entity
 @Getter
 @NoArgsConstructor
-public class UserMileage {
-
+public class UserCash {
     @Id
-    @GeneratedValue
-    @Column(name = "user_mileage_id")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "usercash_id")// 반드시 값을 가지도록 합니다.
     private Long id;
 
     @JsonIgnore
@@ -24,14 +23,15 @@ public class UserMileage {
     private User user;
 
     @Column(nullable = false)
-    private int mileage;
+    private int cash;
 
-    public UserMileage(User user) {
+    public UserCash(User user) {
         this.user = user;
-        this.mileage = 0;
+        this.cash = 0;
     }
 
-    public void addUserMileage(int mileage) {
-        this.mileage += mileage;
+    public void addUserCash(int cash) {
+        this.cash += cash;
     }
+
 }

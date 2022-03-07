@@ -9,6 +9,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
+import static javax.persistence.FetchType.LAZY;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
@@ -21,15 +23,15 @@ public class ChatUser extends Timestamped {
     private Long id;
 
     @JoinColumn(name = "USER_ID", nullable = false)
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     private User user;
 
-    @JoinColumn(name = "ROOM_ID", nullable = false )
-    @ManyToOne
+    @JoinColumn(name = "ROOM_ID", nullable = false)
+    @ManyToOne(fetch = LAZY)
     private ChatRoom chatRoom;
 
     public ChatUser(User user, ChatRoom chatRoom) {
-        this.chatRoom=chatRoom;
+        this.chatRoom = chatRoom;
         this.user = user;
     }
 

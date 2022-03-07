@@ -4,11 +4,16 @@ import com.example.janghj.config.security.UserDetailsImpl;
 import com.example.janghj.config.security.kakao.KakaoOAuth2;
 import com.example.janghj.config.security.kakao.KakaoUserInfo;
 import com.example.janghj.domain.Address;
+import com.example.janghj.domain.TestDto;
 import com.example.janghj.domain.User.User;
-import com.example.janghj.domain.User.UserRole;
+import com.example.janghj.domain.User.UserCash;
+import com.example.janghj.domain.User.UserMileage;
+import com.example.janghj.repository.UserCashRepository;
+import com.example.janghj.repository.UserMileageRepository;
 import com.example.janghj.repository.UserRepository;
 import com.example.janghj.web.dto.UserDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,17 +21,21 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class UserService {
-    private static final String ADMIN_TOKEN = "AAABnv/xRVklrnYxKZ0aHgTBcXukeZygoC";
+    private static final String ADMIN_TOKEN = "ADMAAABnvxR242K45M2K252m22k2mGLWklrnYxKZ0aHgTBcXukeZygoC";
+
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final UserCashRepository userCashRepository;
+    private final UserMileageRepository userMileageRepository;
 
+    //    private final S3Manager s3Manager;
     private final KakaoOAuth2 kakaoOAuth2;
     private final AuthenticationManager authenticationManager;
 
@@ -36,10 +45,12 @@ public class UserService {
                 .username(userDto.getUsername())
                 .password(passwordEncoder.encode(userDto.getPassword()))
                 .email(userDto.getEmail())
-                .role(UserRole.USER)
                 .address(userDto.getAddress())
                 .build();
         userRepository.save(user);
+
+        userCashRepository.save(new UserCash(user));
+        userMileageRepository.save(new UserMileage(user));
         return user;
     }
 
@@ -57,22 +68,56 @@ public class UserService {
 
     public boolean confirmPassword(UserDto userDto) {
         User user = userRepository.findByUsername(userDto.getUsername()).orElseThrow(
-                () -> new NullPointerException("해당 사용자가 없습니다. userId = " + userDto.getUsername())
+                () -> new NullPointerException("해당 사용자가 없습니다. userName = " + userDto.getUsername())
         );
-        if (!passwordEncoder.matches(userDto.getPassword(), user.getPassword())) {
+        if (passwordEncoder.matches(userDto.getPassword(), user.getPassword())) {
             return true;
         }
         return false;
     }
 
-    @Transactional
-    public User userSetAddress(UserDetailsImpl nowUser, Address address) throws IOException {
+    public void userSetProfileImgUrl(UserDetailsImpl nowUser, MultipartFile multipartFile) {
+        User user = userRepository.findById(nowUser.getId()).orElseThrow(
+                () -> new NullPointerException("해당 사용자가 없습니다. userId =" + nowUser.getId()));
+//        String profileImgUrl = s3Manager.upload(multipartFile... "profile"); // S3 profile 폴더에 저장하고 클라우드 프론트 url 반환
+//        user.setProfileImgUrl(profileImgUrl);
+    }
+
+    @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
+    public User userSetAddress(UserDetailsImpl nowUser, Address address) {
         User user = userRepository.findById(nowUser.getId()).orElseThrow(
                 () -> new NullPointerException("해당 사용자가 없습니다. userId =" + nowUser.getId()));
         user.setAddress(address);
         userRepository.save(user);
         return user;
     }
+
+
+    @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
+    public UserCash addUserCash(UserDetailsImpl nowUser, int readyCash) {
+        UserCash userCash = userCashRepository.findByUserId(nowUser.getId()).orElseThrow(
+                () -> new NullPointerException("해당 사용자가 보유한 UserCash 을(를) 찾을 수 없습니다. userId = " + nowUser.getId()));
+        userCash.addUserCash(readyCash);
+        return userCash;
+    }
+
+    @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
+    public void addUserMileage(TestDto testDto) {
+        int money = Integer.parseInt(testDto.getReadyMileage());
+        UserMileage userMileage = userMileageRepository.findByUserId(1L).orElseThrow(
+                () -> new NullPointerException("해당 사용자가 보유한 UserMileage 을(를) 찾을 수 없습니다. "));
+        userMileage.addUserMileage(1000);
+    }
+
+
+//    @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
+//    public UserMileage addUserMileage(UserDetailsImpl nowUser, int readyMileage) {
+//        UserMileage userMileage = userMileageRepository.findByUserId(nowUser.getId()).orElseThrow(
+//                () -> new NullPointerException("해당 사용자가 보유한 UserMileage 을(를) 찾을 수 없습니다. userId = " + nowUser.getId()));
+//        userMileage.addUserMileage(readyMileage);
+//        return userMileage;
+//    }
+
 
     public void kakaoLogin(String authorizedCode) {
         // 카카오 OAuth2 를 통해 카카오 사용자 정보 조회
@@ -93,9 +138,8 @@ public class UserService {
         if (kakaoUser == null) {
             // 패스워드 인코딩
             String encodedPassword = passwordEncoder.encode(password);
-            // ROLE = 사용자
-            UserRole role = UserRole.USER;
-            kakaoUser = new User(kakaoId, username, encodedPassword, email, role);
+
+            kakaoUser = new User(kakaoId, username, encodedPassword, email);
             userRepository.save(kakaoUser);
         }
 
@@ -104,5 +148,4 @@ public class UserService {
         Authentication authentication = authenticationManager.authenticate(kakaoUsernamePassword);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
-
 }
