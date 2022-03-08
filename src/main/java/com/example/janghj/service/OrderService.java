@@ -1,8 +1,5 @@
 package com.example.janghj.service;
 
-import com.example.janghj.domain.Delivery;
-import com.example.janghj.domain.Order;
-import com.example.janghj.domain.User.User;
 import com.example.janghj.repository.DeliveryRepository;
 import com.example.janghj.repository.ItemRepository;
 import com.example.janghj.repository.OrderRepository;
@@ -10,8 +7,6 @@ import com.example.janghj.repository.UserRepository;
 import com.example.janghj.web.dto.OrderDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -22,17 +17,24 @@ public class OrderService {
     private final DeliveryRepository deliveryRepository;
 
     public void order(OrderDto orderDto) {
-
-        User user = userRepository.findById(0L).orElseThrow(
-                () -> new NullPointerException("해당 아이템이 없습니다. itemId = " + 0)
-        );
         orderDto.getOrderList().forEach((key, value) ->
-//                        System.out.println("key : " + key + ", value " + value)
-                        new Order()
+                        System.out.println("key : " + key + ", value " + value));
 
-        );
 
-        Delivery delivery = new Delivery();
+//        Outer outer = new Outer();
+//        User user = userRepository.findById(0L).orElseThrow(
+//                () -> new NullPointerException("해당 사용자가 없습니다. userId = " + 0L)
+//        );
+
+//        orderDto.getOrderList().forEach((key, value) ->
+////                        System.out.println("key : " + key + ", value " + value)
+//                itemRepository.findById((Long)key).orElseThrow(
+//                        () -> new NullPointerException("해당 아이템이 없습니다. itemId = " + key)
+//                )
+
+//        JpaRepository<Order, Long> {
+//});
+
 
 //                .orElseThrow(
 //                    () -> new NullPointerException("해당 아이템이 없습니다. itemId = " + userDto.getUsername())

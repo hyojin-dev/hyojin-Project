@@ -1,7 +1,6 @@
 package com.example.janghj.domain.item;
 
 import com.example.janghj.domain.Category;
-import com.example.janghj.domain.DeliveryStatus;
 import com.example.janghj.domain.Order;
 import com.example.janghj.domain.Timestamped;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -36,16 +35,15 @@ public abstract class Item extends Timestamped {
 
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
-    private ItemColor color;
-
-    @JsonIgnore
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "order_id")
-    private Order order;
+    private ItemColor itemColor;
 
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private Category category;
 
+    @JsonIgnore
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "order_id")
+    private Order order;
 
 }

@@ -22,7 +22,7 @@ public class OrderController {
 
 
     @Operation(description = "유저가 주문하기, 로그인 필요", method = "POST")
-    @PostMapping("/order")
+    @PostMapping("/orders")
     public void order(@RequestBody OrderDto orderDto) {
         orderService.order(orderDto);
     }
