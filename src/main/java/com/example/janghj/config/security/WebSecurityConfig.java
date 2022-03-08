@@ -49,7 +49,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                인증 과정 필요함
 //                .antMatchers(HttpMethod.GET, "/..").authenticated()
 
-                .antMatchers(HttpMethod.PUT, "/reviews/**").authenticated()
+                .antMatchers(HttpMethod.PUT, "/reviedfdfws/**").authenticated()
 
                 // 그 외 모든 요청은 인증과정 필요
                 // .anyRequest().authenticated()

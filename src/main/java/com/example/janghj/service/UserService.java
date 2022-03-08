@@ -4,7 +4,6 @@ import com.example.janghj.config.security.UserDetailsImpl;
 import com.example.janghj.config.security.kakao.KakaoOAuth2;
 import com.example.janghj.config.security.kakao.KakaoUserInfo;
 import com.example.janghj.domain.Address;
-import com.example.janghj.domain.TestDto;
 import com.example.janghj.domain.User.User;
 import com.example.janghj.domain.User.UserCash;
 import com.example.janghj.domain.User.UserMileage;
@@ -13,7 +12,6 @@ import com.example.janghj.repository.UserMileageRepository;
 import com.example.janghj.repository.UserRepository;
 import com.example.janghj.web.dto.UserDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -54,7 +52,7 @@ public class UserService {
         return user;
     }
 
-    public Boolean checkExist(String username) {
+    public Boolean validationUserId(String username) {
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isPresent()) {
             return true;
@@ -84,7 +82,7 @@ public class UserService {
     }
 
     @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
-    public User userSetAddress(UserDetailsImpl nowUser, Address address) {
+    public User setUserAddress(UserDetailsImpl nowUser, Address address) {
         User user = userRepository.findById(nowUser.getId()).orElseThrow(
                 () -> new NullPointerException("해당 사용자가 없습니다. userId =" + nowUser.getId()));
         user.setAddress(address);
@@ -94,29 +92,30 @@ public class UserService {
 
 
     @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
-    public UserCash addUserCash(UserDetailsImpl nowUser, int readyCash) {
+    public UserCash depositUserCash(UserDetailsImpl nowUser, int readyCash) {
         UserCash userCash = userCashRepository.findByUserId(nowUser.getId()).orElseThrow(
                 () -> new NullPointerException("해당 사용자가 보유한 UserCash 을(를) 찾을 수 없습니다. userId = " + nowUser.getId()));
         userCash.addUserCash(readyCash);
         return userCash;
     }
 
-    @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
-    public void addUserMileage(TestDto testDto) {
-        int money = Integer.parseInt(testDto.getReadyMileage());
-        UserMileage userMileage = userMileageRepository.findByUserId(1L).orElseThrow(
-                () -> new NullPointerException("해당 사용자가 보유한 UserMileage 을(를) 찾을 수 없습니다. "));
-        userMileage.addUserMileage(1000);
-    }
-
 
 //    @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
-//    public UserMileage addUserMileage(UserDetailsImpl nowUser, int readyMileage) {
-//        UserMileage userMileage = userMileageRepository.findByUserId(nowUser.getId()).orElseThrow(
-//                () -> new NullPointerException("해당 사용자가 보유한 UserMileage 을(를) 찾을 수 없습니다. userId = " + nowUser.getId()));
-//        userMileage.addUserMileage(readyMileage);
-//        return userMileage;
+//    public void addUserMileage(TestDto testDto) {
+//        int money = Integer.parseInt(testDto.getReadyMileage());
+//        UserMileage userMileage = userMileageRepository.findByUserId(1L).orElseThrow(
+//                () -> new NullPointerException("해당 사용자가 보유한 UserMileage 을(를) 찾을 수 없습니다. "));
+//        userMileage.addUserMileage(1000);
 //    }
+
+
+    @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
+    public UserMileage depositUserMileage(UserDetailsImpl nowUser, int readyMileage) {
+        UserMileage userMileage = userMileageRepository.findByUserId(nowUser.getId()).orElseThrow(
+                () -> new NullPointerException("해당 사용자가 보유한 UserMileage 을(를) 찾을 수 없습니다. userId = " + nowUser.getId()));
+        userMileage.addUserMileage(readyMileage);
+        return userMileage;
+    }
 
 
     public void kakaoLogin(String authorizedCode) {

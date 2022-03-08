@@ -38,4 +38,12 @@ public class Order extends Timestamped {
     @OneToOne(fetch = LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "delivery_id")
     private Delivery delivery;
+
+    public Order(User user, int orderPrice, int count, List<Item> orderItems, Delivery delivery) {
+        this.orderPrice = orderPrice;
+        this.count = count;
+        this.user = user;
+        this.orderItems = orderItems;
+        this.delivery = delivery;
+    }
 }
