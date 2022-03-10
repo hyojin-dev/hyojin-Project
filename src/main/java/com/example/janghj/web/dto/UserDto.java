@@ -9,4 +9,7 @@ public class UserDto {
     String password;
     String email;
     Address address;
+
+    private boolean admin = false;
+    private String adminToken = "";
 }

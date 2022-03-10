@@ -24,6 +24,7 @@ public class Order extends Timestamped {
     private Long id;
 
     private int orderPrice; //주문 가격
+
     private int count; //주문 수량
 
     @ManyToOne(fetch = LAZY)

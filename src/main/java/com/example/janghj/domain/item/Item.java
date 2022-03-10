@@ -3,11 +3,15 @@ package com.example.janghj.domain.item;
 import com.example.janghj.domain.Category;
 import com.example.janghj.domain.Order;
 import com.example.janghj.domain.Timestamped;
+import com.example.janghj.domain.User.UserLikes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+
+import java.util.List;
 
 import static javax.persistence.FetchType.LAZY;
 
@@ -33,17 +37,19 @@ public abstract class Item extends Timestamped {
     @Column(nullable = false)
     private int stockQuantity;
 
-    @Column(nullable = false)
-    @Enumerated(value = EnumType.STRING)
-    private ItemColor itemColor;
+    private int like;
 
-    @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private Category category;
+
+    @Enumerated(value = EnumType.STRING)
+    private ItemColor itemColor;
 
     @JsonIgnore
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
 
+    @OneToMany(mappedBy = "item", cascade = CascadeType.REMOVE)
+    private List<UserLikes> userLikes;
 }

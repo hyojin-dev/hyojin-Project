@@ -2,6 +2,7 @@ package com.example.janghj.config.security;
 
 import com.example.janghj.domain.Address;
 import com.example.janghj.domain.User.User;
+import com.example.janghj.domain.User.UserRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -25,6 +26,8 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     public Address getAddress() { return user.getAddress(); }
+
+    public UserRole getUserRole() { return user.getRole(); }
 
     @Override
     public String getPassword() {

@@ -7,6 +7,7 @@ import com.example.janghj.domain.Address;
 import com.example.janghj.domain.User.User;
 import com.example.janghj.domain.User.UserCash;
 import com.example.janghj.domain.User.UserMileage;
+import com.example.janghj.domain.User.UserRole;
 import com.example.janghj.repository.UserCashRepository;
 import com.example.janghj.repository.UserMileageRepository;
 import com.example.janghj.repository.UserRepository;
@@ -26,7 +27,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class UserService {
-    private static final String ADMIN_TOKEN = "ADMAAABnvxR242K45M2K252m22k2mGLWklrnYxKZ0aHgTBcXukeZygoC";
+    private static final String ADMIN_TOKEN = "GMe3md5MK542K45M2ag32K252m22k2mGLWklrnYxKZ0aHgTBG30hfh90H";
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
@@ -39,11 +40,20 @@ public class UserService {
 
 
     public User registerUser(UserDto userDto) {
+        UserRole userRole = UserRole.USER;
+
+        if (userDto.isAdmin()) {
+            if (userDto.getAdminToken().equals(ADMIN_TOKEN)) {
+                userRole = UserRole.ADMIN;
+            }
+        }
+
         User user = User.builder()
                 .username(userDto.getUsername())
                 .password(passwordEncoder.encode(userDto.getPassword()))
                 .email(userDto.getEmail())
                 .address(userDto.getAddress())
+                .userRole(userRole)
                 .build();
         userRepository.save(user);
 
@@ -77,19 +87,22 @@ public class UserService {
     public void userSetProfileImgUrl(UserDetailsImpl nowUser, MultipartFile multipartFile) {
         User user = userRepository.findById(nowUser.getId()).orElseThrow(
                 () -> new NullPointerException("해당 사용자가 없습니다. userId =" + nowUser.getId()));
-//        String profileImgUrl = s3Manager.upload(multipartFile... "profile"); // S3 profile 폴더에 저장하고 클라우드 프론트 url 반환
-//        user.setProfileImgUrl(profileImgUrl);
     }
 
     @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
-    public User setUserAddress(UserDetailsImpl nowUser, Address address) {
+    public User setUserAddress(UserDetailsImpl nowUser, Address address, MultipartFile multipartFile) {
         User user = userRepository.findById(nowUser.getId()).orElseThrow(
                 () -> new NullPointerException("해당 사용자가 없습니다. userId =" + nowUser.getId()));
-        user.setAddress(address);
+
+        if (address != null) {
+            user.setAddress(address);
+        }
+        if (multipartFile != null) {
+//            s3 연동 로직 예정
+        }
         userRepository.save(user);
         return user;
     }
-
 
     @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
     public UserCash depositUserCash(UserDetailsImpl nowUser, int readyCash) {
@@ -99,16 +112,6 @@ public class UserService {
         return userCash;
     }
 
-
-//    @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
-//    public void addUserMileage(TestDto testDto) {
-//        int money = Integer.parseInt(testDto.getReadyMileage());
-//        UserMileage userMileage = userMileageRepository.findByUserId(1L).orElseThrow(
-//                () -> new NullPointerException("해당 사용자가 보유한 UserMileage 을(를) 찾을 수 없습니다. "));
-//        userMileage.addUserMileage(1000);
-//    }
-
-
     @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
     public UserMileage depositUserMileage(UserDetailsImpl nowUser, int readyMileage) {
         UserMileage userMileage = userMileageRepository.findByUserId(nowUser.getId()).orElseThrow(
@@ -116,7 +119,6 @@ public class UserService {
         userMileage.addUserMileage(readyMileage);
         return userMileage;
     }
-
 
     public void kakaoLogin(String authorizedCode) {
         // 카카오 OAuth2 를 통해 카카오 사용자 정보 조회

@@ -1,20 +1,14 @@
 package com.example.janghj.repository;
 
+import com.example.janghj.domain.Category;
 import com.example.janghj.domain.item.Item;
-import com.example.janghj.web.dto.ItemDto;
-import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.EntityManager;
+import java.util.List;
 
-@RequiredArgsConstructor
 @Repository
-public class ItemRepository {
-
-    private final EntityManager em;
-
-    public void save(ItemDto itemDto) {
-
-    }
+public interface ItemRepository extends JpaRepository<Item, Long> {
+    List<Item> findAllByCategory(Category category);
 
 }

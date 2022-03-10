@@ -1,7 +1,6 @@
 package com.example.janghj.web.dto;
 
 import com.example.janghj.domain.Category;
-import com.example.janghj.domain.item.Item;
 import com.example.janghj.domain.item.ItemColor;
 import lombok.Getter;
 
@@ -10,8 +9,14 @@ public class ItemDto {
     String name;
     int price;
     int stockQuantity;
-    ItemColor itemColor;
-    Category category;
-    Item item;
+    Category category; // TOP, PANTS, OUTER, SHOES, BAG
+    ItemColor itemColor; // RED, ORANGE, YELLOW, GREEN, BLUE, NAVY, PURPLE
+
+    int topSize;
+    int pantsSize;
+    int outerSize;
+    int shoesSize;
+    int bagSize;
+
 
 }

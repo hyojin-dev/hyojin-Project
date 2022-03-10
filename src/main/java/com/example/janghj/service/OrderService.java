@@ -1,12 +1,21 @@
 package com.example.janghj.service;
 
+import com.example.janghj.config.security.UserDetailsImpl;
+import com.example.janghj.domain.Order;
+import com.example.janghj.domain.item.Item;
+import com.example.janghj.domain.item.Top;
 import com.example.janghj.repository.DeliveryRepository;
 import com.example.janghj.repository.ItemRepository;
 import com.example.janghj.repository.OrderRepository;
 import com.example.janghj.repository.UserRepository;
 import com.example.janghj.web.dto.OrderDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 @RequiredArgsConstructor
 @Service
@@ -17,39 +26,27 @@ public class OrderService {
     private final DeliveryRepository deliveryRepository;
 
     public void order(OrderDto orderDto) {
+        Queue orderList = new ConcurrentLinkedQueue<Item>();
+
+
         orderDto.getOrderList().forEach((key, value) ->
-                        System.out.println("key : " + key + ", value " + value));
+                orderList.offer(itemRepository.findById(Long.parseLong(key.toString())).orElseThrow(
+                        () -> new NullPointerException("해당 주문이 존재하지 않습니다. itemId = " + key)
+                )));
+    }
 
+    public Order getOrder(Long orderId) {
+        return orderRepository.findById(orderId).orElseThrow(
+                () -> new NullPointerException("해당 주문이 존재하지 않습니다. itemId = " + orderId)
+        );
+    }
 
-//        Outer outer = new Outer();
-//        User user = userRepository.findById(0L).orElseThrow(
-//                () -> new NullPointerException("해당 사용자가 없습니다. userId = " + 0L)
-//        );
+    public List<Order> getOrders(UserDetailsImpl nowUser) {
+        return orderRepository.findAllByUserId(nowUser.getId());
+    }
 
-//        orderDto.getOrderList().forEach((key, value) ->
-////                        System.out.println("key : " + key + ", value " + value)
-//                itemRepository.findById((Long)key).orElseThrow(
-//                        () -> new NullPointerException("해당 아이템이 없습니다. itemId = " + key)
-//                )
-
-//        JpaRepository<Order, Long> {
-//});
-
-
-//                .orElseThrow(
-//                    () -> new NullPointerException("해당 아이템이 없습니다. itemId = " + userDto.getUsername())
-//            );
-
-
-//        String orderList = orderDto.getOrderList().toString();
-//        // [{itemId=3, count=2}, {itemId=1, count=4} ...]
-//        String[] stringOrderData = orderList.replaceAll("[^\\d+,]", "").split(",");
-//        // String 3,2,1,4...
-//        int[] intOrderData = Arrays.asList(stringOrderData).stream().mapToInt(Integer::parseInt).toArray();
-//        // int 3,2,1,4...
-//        for (int data : intOrderData) {
-//            System.out.println(data);
-//        }
+    public void orderCancel(Long orderId) {
+        orderRepository.deleteById(orderId);
     }
 
 }

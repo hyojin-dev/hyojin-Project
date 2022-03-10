@@ -31,7 +31,6 @@ public class User extends Timestamped {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
     private String email;
 
     @Column(nullable = false)
@@ -47,24 +46,27 @@ public class User extends Timestamped {
     private List<Order> order = new ArrayList<>();
 
     @JsonIgnore
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private UserCash userCash;
 
     @JsonIgnore
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private UserMileage userMileage;
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserCoupon> userCoupon = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<UserLikes> userLike;
+
     @Builder
-    public User(String username, String password, String email, Address address) {
+    public User(String username, String password, String email, Address address, UserRole userRole) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.address = address;
-        this.role = UserRole.USER;
+        this.role = userRole;
     }
 
     public User(String username, String password, String email) {

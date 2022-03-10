@@ -27,6 +27,7 @@ public class UserController {
     private final UserDetailsService userDetailsService;
     private final UserService userService;
 
+
     @Operation(description = "회원가입 시 아이디 유효성 검사", method = "GET")
     @GetMapping("/users/signup/check")
     public ResponseEntity<?> validationUserId(@RequestBody UserDto userDto) {
@@ -38,20 +39,26 @@ public class UserController {
     }
 
     @Operation(description = "회원가입", method = "POST")
-    @PostMapping("/users")
-    public String registerUser(@RequestBody UserDto userDto) throws Exception {
-        userService.registerUser(userDto);
-        return "'" + userDto.getUsername() + "'님 회원가입을 축하드립니다!";
+    @PostMapping("/user")
+    public ResponseEntity<?> registerUser(@RequestBody UserDto userDto) throws Exception {
+        User user = userService.registerUser(userDto);
+        if (user.getRole().equals("User")) {
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else if (user.getRole().equals("Admin")) {
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        }
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
     @Operation(description = "회원탈퇴", method = "DELETE")
-    @DeleteMapping("/users")
-    public void deleteUser(@AuthenticationPrincipal UserDetailsImpl nowUser) {
+    @DeleteMapping("/user")
+    public ResponseEntity<?> deleteUser(@AuthenticationPrincipal UserDetailsImpl nowUser) {
         userService.deleteUser(nowUser.getUser().getId());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Operation(description = "로그인", method = "POST")
-    @PostMapping("/users/login")
+    @PostMapping("/user/login")
     public ResponseEntity<?> loginUser(@RequestBody UserDto userDto) throws Exception {
         if (!userService.confirmPassword(userDto)) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -61,15 +68,15 @@ public class UserController {
         return ResponseEntity.ok(new JwtTokenDto(token, userDetails.getUsername()));
     }
 
-    @Operation(description = "유저 주소 설정, 로그인 필요", method = "PUT")
-    @PutMapping("/users")
+    @Operation(description = "유저 주소, 프로필사진 설정, 로그인 필요", method = "PUT")
+    @PutMapping("/user")
     public User updateProfile(@AuthenticationPrincipal UserDetailsImpl nowUser, @RequestBody Address address,
                               @RequestPart(name = "profileImgUrl", required = false) MultipartFile multipartFile) throws IOException {
-        return userService.setUserAddress(nowUser, address);
+        return userService.setUserAddress(nowUser, address, multipartFile);
     }
 
-    @Operation(description = "유저 현금 입금하기, 로그인 필요", method = "POST")
-    @PostMapping("/users/cash")
+    @Operation(description = "유저 현금 충전하기, 로그인 필요", method = "POST")
+    @PostMapping("/user/cash")
     public ResponseEntity<?> depositUserCash(@AuthenticationPrincipal UserDetailsImpl nowUser, @RequestPart(required = false) int readyCash) throws IOException {
 //        AOP 작업 예정 - try 문(03.08 장효진)
         try {
@@ -82,21 +89,8 @@ public class UserController {
         }
     }
 
-//    @Operation(description = "유저 현금 결재하기, 로그인 필요", method = "POST")
-//    @PostMapping("/users/payment/cash")
-//    public ResponseEntity<?> paymentUserCash(@AuthenticationPrincipal UserDetailsImpl nowUser, @RequestPart(required = false) int readyCash) throws IOException {
-//        userService.paymentUserCash(nowUser, readyCash);
-//            return new ResponseEntity<>(HttpStatus.OK);
-//    }
-
-//    테스트
-//    @Operation(description = "유저 마일리지 추가, 로그인 필요", method = "POST")
-//    @PostMapping("/users/payment/mileage")
-//    public void addUserMileage(@RequestBody TestDto test) throws IOException {
-//        userService.addUserMileage(test);
-//    }
     @Operation(description = "유저 마일리지 추가하기, 로그인 필요", method = "POST")
-    @PostMapping("/users/mileage")
+    @PostMapping("/user/mileage")
     public ResponseEntity<?> addUserMileage(@AuthenticationPrincipal UserDetailsImpl nowUser, @RequestPart(required = false) int readyMileage) throws IOException {
         try {
             userService.depositUserMileage(nowUser, readyMileage);
@@ -107,19 +101,6 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     //   <button id="login-kakao-btn"
     //	onclick="location.href='https://kauth.kakao.com/oauth/authorize?client_id=e81c288c3e5afca68f122b4db3bc314f&" +
