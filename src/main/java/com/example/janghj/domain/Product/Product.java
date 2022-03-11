@@ -3,14 +3,12 @@ package com.example.janghj.domain.Product;
 import com.example.janghj.domain.Category;
 import com.example.janghj.domain.Order;
 import com.example.janghj.domain.Timestamped;
-import com.example.janghj.domain.User.UserLikes;
+import com.example.janghj.domain.User.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.List;
 
 import static javax.persistence.FetchType.LAZY;
 
@@ -47,6 +45,10 @@ public abstract class Product extends Timestamped {
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private ProductColor productColor;
+
+    @JoinColumn(name = "order_id")
+    @ManyToOne(fetch = LAZY)
+    private Order order;
 
     public Product(String name, int price, int stockQuantity, Category category, ProductColor productColor) {
         this.name = name;

@@ -2,6 +2,7 @@ package com.example.janghj.domain.User;
 
 import com.example.janghj.domain.Product.Product;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,7 +10,7 @@ import javax.persistence.*;
 
 import static javax.persistence.FetchType.LAZY;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
 public class UserLikes {

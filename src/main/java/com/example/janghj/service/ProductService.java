@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -17,15 +18,9 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
-    public void registerProduct(Product product) {
-        System.out.println(product.getId());
-        System.out.println(product.getName());
-        System.out.println(product.getClass());
-        try {
-            productRepository.save(product);
-        } catch (Exception e) {
-            System.out.println("아니 왜?");
-        }
+    public void getProduct(Long id) {
+        Optional product = productRepository.findById(id);
+//
     }
 
     //    default = 최신순
@@ -38,7 +33,6 @@ public class ProductService {
             return productRepository.findAllByCategory(productSearchDto.getCategory());
         }
         return productRepository.findAllByCategory(productSearchDto.getCategory(), Sort.by(Sort.Direction.DESC, "CreatedAt"));
-//        return productRepository.findAll(Sort.by(Sort.Direction.DESC, "CreatedAt"));
     }
 
     public void deleteProduct(UserDetailsImpl nowUser, Long itemId) {

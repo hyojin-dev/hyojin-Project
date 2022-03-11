@@ -2,11 +2,12 @@ package com.example.janghj.domain.Product;
 
 import com.example.janghj.domain.Category;
 import com.example.janghj.web.dto.ProductDto;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Table;
 
 @Entity
 @Getter
@@ -19,5 +20,10 @@ public class Top extends Product {
     public Top(ProductDto productDto) {
         super(productDto.getName(), productDto.getPrice(), productDto.getStockQuantity(), productDto.getCategory(), productDto.getProductColor());
         this.topSize = productDto.getTopSize();
+    }
+
+    public Top(int topSize) {
+        super("test", 1234, 12, Category.TOP, ProductColor.BLUE);
+        this.topSize = topSize;
     }
 }

@@ -2,14 +2,11 @@ package com.example.janghj.web;
 
 import com.example.janghj.config.security.UserDetailsImpl;
 import com.example.janghj.domain.Order;
-import com.example.janghj.repository.OrderRepository;
 import com.example.janghj.service.OrderService;
-import com.example.janghj.service.UserService;
-import com.example.janghj.web.dto.OrderDto;
+import com.example.janghj.web.dto.OrderWebDto;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,8 +20,8 @@ public class OrderController {
 
     @Operation(description = "주문하기, 로그인 필요", method = "POST")
     @PostMapping("/order")
-    public void order(@RequestBody OrderDto orderDto) {
-        orderService.order(orderDto);
+    public void order(@RequestBody OrderWebDto orderWebDto) {
+        orderService.order(orderWebDto);
     }
 
     @Operation(description = "주문 1개 조회하기 , 로그인 필요", method = "GET")

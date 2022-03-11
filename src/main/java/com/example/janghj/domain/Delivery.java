@@ -1,6 +1,7 @@
 package com.example.janghj.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,10 +11,11 @@ import static javax.persistence.FetchType.LAZY;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Delivery extends Timestamped {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     @Column(name = "delivery_id")
     private Long id;
 
@@ -27,9 +29,7 @@ public class Delivery extends Timestamped {
     @Enumerated(EnumType.STRING)
     private DeliveryStatus status; //READY, COMP
 
-    public Delivery(Order order, Address address, DeliveryStatus status) {
+    public Delivery(Order order) {
         this.order = order;
-        this.address = address;
-        this.status = status;
     }
 }

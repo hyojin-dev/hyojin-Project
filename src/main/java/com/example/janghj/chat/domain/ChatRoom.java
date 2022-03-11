@@ -4,6 +4,7 @@ import com.example.janghj.chat.dto.ChatRoomDTO;
 import com.example.janghj.domain.Timestamped;
 import com.example.janghj.domain.User.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,7 +16,7 @@ import static javax.persistence.FetchType.LAZY;
 
 @Setter
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class ChatRoom extends Timestamped {
 

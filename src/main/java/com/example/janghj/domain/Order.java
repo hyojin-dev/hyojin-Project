@@ -1,8 +1,10 @@
 package com.example.janghj.domain;
 
-import com.example.janghj.domain.User.User;
 import com.example.janghj.domain.Product.Product;
+import com.example.janghj.domain.User.User;
+import com.example.janghj.web.dto.OrderItem;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,7 +17,7 @@ import static javax.persistence.FetchType.LAZY;
 @Entity
 @Table(name = "orders")
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order extends Timestamped {
 
     @Id
@@ -23,28 +25,26 @@ public class Order extends Timestamped {
     @Column(name = "order_id")
     private Long id;
 
-    private int orderPrice; //주문 가격
-
-    private int count; //주문 수량
-
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-//    @JsonIgnore
-//    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-//    private List<Product> orderProducts = new ArrayList<>();
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderItem> orderProducts = new ArrayList<>();
 
-    @JsonIgnore
     @OneToOne(fetch = LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "delivery_id")
     private Delivery delivery;
 
-    public Order(User user, int orderPrice, int count, Delivery delivery) {
-        this.orderPrice = orderPrice;
-        this.count = count;
+
+    public Order(User user, Delivery delivery) {
         this.user = user;
-//        this.orderProducts = orderProducts;
         this.delivery = delivery;
+    }
+
+    //    Test 용도
+
+    public Order(List<OrderItem> orderProducts) {
+        this.orderProducts = orderProducts;
     }
 }
