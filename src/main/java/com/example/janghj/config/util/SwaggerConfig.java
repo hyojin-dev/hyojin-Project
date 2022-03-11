@@ -7,9 +7,10 @@ public class SwaggerConfig {
     @Bean
     public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()
-                .group("")
+                .group("com.example.janghj")
                 .pathsToMatch("/**")
-                .packagesToScan("")
+                .packagesToScan("com.example.janghj.web")
                 .build();
+//        http://localhost:8080/swagger-ui.html
     }
 }

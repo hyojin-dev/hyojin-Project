@@ -18,10 +18,7 @@ import java.util.List;
 @RestController // JSON으로 데이터를 주고받음을 선언합니다.
 public class OrderController {
 
-    private final UserService userService;
-    private final UserDetailsService userDetailsService;
     private final OrderService orderService;
-    private final OrderRepository orderRepository;
 
 
     @Operation(description = "주문하기, 로그인 필요", method = "POST")

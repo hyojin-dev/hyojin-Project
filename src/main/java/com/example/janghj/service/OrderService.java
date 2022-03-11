@@ -2,15 +2,12 @@ package com.example.janghj.service;
 
 import com.example.janghj.config.security.UserDetailsImpl;
 import com.example.janghj.domain.Order;
-import com.example.janghj.domain.item.Item;
-import com.example.janghj.domain.item.Top;
+import com.example.janghj.domain.Product.Product;
 import com.example.janghj.repository.DeliveryRepository;
-import com.example.janghj.repository.ItemRepository;
 import com.example.janghj.repository.OrderRepository;
 import com.example.janghj.repository.UserRepository;
 import com.example.janghj.web.dto.OrderDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,16 +18,15 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 @Service
 public class OrderService {
     private final UserRepository userRepository;
-    private final ItemRepository itemRepository;
     private final OrderRepository orderRepository;
     private final DeliveryRepository deliveryRepository;
 
     public void order(OrderDto orderDto) {
-        Queue orderList = new ConcurrentLinkedQueue<Item>();
+        Queue orderList = new ConcurrentLinkedQueue<Product>();
 
 
         orderDto.getOrderList().forEach((key, value) ->
-                orderList.offer(itemRepository.findById(Long.parseLong(key.toString())).orElseThrow(
+                orderList.offer(orderRepository.findById(Long.parseLong(key.toString())).orElseThrow(
                         () -> new NullPointerException("해당 주문이 존재하지 않습니다. itemId = " + key)
                 )));
     }

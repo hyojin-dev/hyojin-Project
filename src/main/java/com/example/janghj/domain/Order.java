@@ -1,7 +1,7 @@
 package com.example.janghj.domain;
 
 import com.example.janghj.domain.User.User;
-import com.example.janghj.domain.item.Item;
+import com.example.janghj.domain.Product.Product;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,20 +31,20 @@ public class Order extends Timestamped {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<Item> orderItems = new ArrayList<>();
+//    @JsonIgnore
+//    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+//    private List<Product> orderProducts = new ArrayList<>();
 
     @JsonIgnore
     @OneToOne(fetch = LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "delivery_id")
     private Delivery delivery;
 
-    public Order(User user, int orderPrice, int count, List<Item> orderItems, Delivery delivery) {
+    public Order(User user, int orderPrice, int count, Delivery delivery) {
         this.orderPrice = orderPrice;
         this.count = count;
         this.user = user;
-        this.orderItems = orderItems;
+//        this.orderProducts = orderProducts;
         this.delivery = delivery;
     }
 }
