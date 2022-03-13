@@ -29,6 +29,7 @@ public class UserDetailsImpl implements UserDetails {
 
     public UserRole getUserRole() { return user.getRole(); }
 
+
     @Override
     public String getPassword() {
         return user.getPassword();

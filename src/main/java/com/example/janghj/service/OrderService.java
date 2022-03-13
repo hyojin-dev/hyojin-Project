@@ -1,20 +1,18 @@
 package com.example.janghj.service;
 
 import com.example.janghj.config.security.UserDetailsImpl;
-import com.example.janghj.domain.Address;
 import com.example.janghj.domain.Delivery;
-import com.example.janghj.domain.DeliveryStatus;
 import com.example.janghj.domain.Order;
 import com.example.janghj.domain.Product.Product;
 import com.example.janghj.domain.User.User;
-import com.example.janghj.domain.User.UserRole;
 import com.example.janghj.repository.DeliveryRepository;
 import com.example.janghj.repository.OrderRepository;
 import com.example.janghj.repository.ProductRepository;
 import com.example.janghj.repository.UserRepository;
-import com.example.janghj.web.dto.OrderItem;
+import com.example.janghj.web.dto.OrderProduct;
 import com.example.janghj.web.dto.OrderWebDto;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,43 +28,32 @@ public class OrderService {
 
 
     public void order(OrderWebDto orderWebDto) {
-        List<OrderItem> productList = new ArrayList<>();
+//        User user = userRepository.findById(nowUser.getId()).orElseThrow(
+//                () -> new NullPointerException("해당 유저가 존재하지 않습니다. id  = " + nowUser.getId()));
 
-        orderWebDto.getOrderList().forEach((productId, quantity) ->
-//                productList.add(createOrder(Long.parseLong((String) productId), (Integer) quantity)));
+        User user = userRepository.findById(1L).orElseThrow(
+                () -> new NullPointerException("해당 유저가 존재하지 않습니다. id  = " + 1L));
 
-        User user = User.builder()
-                .username("test")
-                .password("dsgsd")
-                .email("asgf")
-                .address(new Address("city", "street", "zipcode"))
-                .userRole(UserRole.USER)
-                .build();
-        userRepository.save(user);
-        User user1 = userRepository.findById(1L).orElseThrow(
-                () -> new NullPointerException("해당 사용자가 없습니다. userName = " )
-        );
-
-        Delivery delivery = new Delivery(new Address("city", "street", "zipcode"), DeliveryStatus.READY);
-        deliveryRepository.save(delivery);
-        Order order = new Order(user1, productList, delivery);
+        Order order = new Order(user);
         orderRepository.save(order);
 
-//        Delivery delivery = new Delivery(order);
+        List<OrderProduct> orderProducts = new ArrayList<>();
+        orderWebDto.getOrderList().forEach((productId, quantity) ->
+                orderProducts.add(createOrder(Long.parseLong((String) productId), (Integer) quantity, order)));
+        order.setOrderProduct(orderProducts);
 
-//        orderDto.getOrderList().forEach((productId, quantity) ->
-//                productList.add((Product) productRepository.getById(productId))
-//        );
-
-//        orderDto.getOrderList().forEach((productId, quantity) ->
-//                createOrder(Long.parseLong((String) productId), (Integer) quantity)
-//                );
+        Delivery delivery = new Delivery(order, user.getAddress());
+        order.setDelivery(delivery);
+        orderRepository.save(order);
     }
 
-//    public OrderItem createOrder(Long productId, int quantity) {
-//        Product product = (Product) productRepository.getById(productId);
-////        Product productId, Order order, int orderPrice, int count
-//    }
+    @SneakyThrows // try-catch 기능을 대체해줌
+    public OrderProduct createOrder(Long productId, int quantity, Order order) {
+        Product product = (Product) productRepository.findById(productId).orElseThrow(
+                () -> new NullPointerException("해당 상품이 없습니다. productId =" + productId));
+        int amount = product.getPrice() * quantity;
+        return new OrderProduct(product, product.getPrice(), order, quantity, amount);
+    }
 
     public Order getOrder(Long orderId) {
         return orderRepository.findById(orderId).orElseThrow(

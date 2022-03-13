@@ -2,6 +2,7 @@ package com.example.janghj.web;
 
 
 import com.example.janghj.config.security.UserDetailsImpl;
+import com.example.janghj.domain.Category;
 import com.example.janghj.domain.Product.Pants;
 import com.example.janghj.domain.Product.Product;
 import com.example.janghj.domain.Product.Shoes;
@@ -9,7 +10,6 @@ import com.example.janghj.domain.Product.Top;
 import com.example.janghj.repository.ProductRepository;
 import com.example.janghj.service.ProductService;
 import com.example.janghj.web.dto.ProductDto;
-import com.example.janghj.web.dto.ProductSearchDto;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -54,8 +54,9 @@ public class ProductController {
 
     @Operation(description = "상품 조회하기(카테고리 검색 + 최신순)", method = "GET")
     @GetMapping("/products")
-    public List<Product> getProducts(ProductSearchDto productSearchDto) {
-        return productService.getProducts(productSearchDto);
+    public List<Product> getProducts(@RequestParam String category, @RequestParam String sort) {
+        Category categoryValue = Category.valueOf(category);
+        return productService.getProducts(categoryValue, sort);
     }
 
     @Operation(description = "상품 삭제하기", method = "DELETE")

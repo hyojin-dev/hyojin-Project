@@ -32,7 +32,11 @@ public class UserMileage {
         this.mileage = 0;
     }
 
-    public void addUserMileage(int mileage) {
+    public void depositUserMileage(int mileage) {
         this.mileage += mileage;
+    }
+
+    public void withdrawalUserMileage(int mileage) {
+        this.mileage -= mileage;
     }
 }

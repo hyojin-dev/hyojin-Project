@@ -3,9 +3,12 @@ package com.example.janghj.web;
 import com.example.janghj.config.security.UserDetailsImpl;
 import com.example.janghj.domain.Order;
 import com.example.janghj.service.OrderService;
+import com.example.janghj.service.UserService;
 import com.example.janghj.web.dto.OrderWebDto;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +19,11 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
+    private final UserService userService;
 
+//    401(권한 없음) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+//    402(결제 필요) return new ResponseEntity<>(HttpStatus.PAYMENT_REQUIRED);
+//    500(서버 오류) return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 
     @Operation(description = "주문하기, 로그인 필요", method = "POST")
     @PostMapping("/order")
@@ -32,22 +39,18 @@ public class OrderController {
 
     @Operation(description = "나의 주문 전체 보기 , 로그인 필요", method = "GET")
     @GetMapping("/orders")
-    public void cancelOrder(@AuthenticationPrincipal UserDetailsImpl nowUser) {
-        List<Order> orderList = orderService.getOrders(nowUser);
+    public List<Order> cancelOrder(@AuthenticationPrincipal UserDetailsImpl nowUser) {
+        return orderService.getOrders(nowUser);
     }
 
     @Operation(description = "주문취소, 로그인 필요", method = "DELETE")
     @DeleteMapping("/order")
-    public void orderCancel(@PathVariable Long orderId) {
-        orderService.orderCancel(orderId);
+    public ResponseEntity<?> orderCancel(@PathVariable Long orderId) {
+        try {
+            orderService.orderCancel(orderId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
-
-
-//        @Operation(description = "유저 현금 결재하기, 로그인 필요", method = "POST")
-//    @PostMapping("/user/payment/cash")
-//    public ResponseEntity<?> paymentUserCash(@AuthenticationPrincipal UserDetailsImpl nowUser,
-//                                             @RequestPart(required = false) int readyCash) {
-//        userService.paymentUserCash(nowUser, readyCash);
-//            return new ResponseEntity<>(HttpStatus.OK);
-//    }
 }

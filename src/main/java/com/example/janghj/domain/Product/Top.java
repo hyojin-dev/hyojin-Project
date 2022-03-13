@@ -21,7 +21,7 @@ public class Top extends Product {
         super(productDto.getName(), productDto.getPrice(), productDto.getStockQuantity(), productDto.getCategory(), productDto.getProductColor());
         this.topSize = productDto.getTopSize();
     }
-
+//  test 용도
     public Top(int topSize) {
         super("test", 1234, 12, Category.TOP, ProductColor.BLUE);
         this.topSize = topSize;

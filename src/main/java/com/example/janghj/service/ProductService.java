@@ -1,10 +1,10 @@
 package com.example.janghj.service;
 
 import com.example.janghj.config.security.UserDetailsImpl;
+import com.example.janghj.domain.Category;
 import com.example.janghj.domain.Product.Product;
 import com.example.janghj.domain.User.UserRole;
 import com.example.janghj.repository.ProductRepository;
-import com.example.janghj.web.dto.ProductSearchDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -17,6 +17,10 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
+//    401(권한 없음) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+//    402(결제 필요) return new ResponseEntity<>(HttpStatus.PAYMENT_REQUIRED);
+//    500(서버 오류) return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+
     public Product getProduct(Long id) {
         Product product = (Product) productRepository.getById(id);
 
@@ -26,12 +30,12 @@ public class ProductService {
         return product;
     }
 
-    public List<Product> getProducts(ProductSearchDto productSearchDto) {
+    public List<Product> getProducts(Category category, String sort) {
         //    1.최신순(default), 2.상품만 검색, 3.상품 검색 + 최신순 검색
-        if (productSearchDto.getCategory() != null && productSearchDto.getSort() == null) {
-            return productRepository.findAllByCategory(productSearchDto.getCategory());
-        } else if (productSearchDto.getCategory() != null && productSearchDto.getSort().equals("date")) {
-            return productRepository.findAllByCategory(productSearchDto.getCategory(), Sort.by(Sort.Direction.DESC, "CreatedAt"));
+        if (category != null && sort == null) {
+            return productRepository.findAllByCategory(category);
+        } else if (category != null && sort.equals("date")) {
+            return productRepository.findAllByCategory(category, Sort.by(Sort.Direction.DESC, "CreatedAt"));
         }
         return productRepository.findAll(Sort.by(Sort.Direction.DESC, "CreatedAt"));
     }

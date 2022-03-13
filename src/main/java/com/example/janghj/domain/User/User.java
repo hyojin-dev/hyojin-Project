@@ -62,12 +62,12 @@ public class User extends Timestamped {
     private List<UserLikes> userLike;
 
     @Builder
-    public User(String username, String password, String email, Address address, UserRole userRole) {
+    public User(String username, String password, String email, Address address ) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.address = address;
-        this.role = userRole;
+        this.role = UserRole.USER;;
     }
 
     public User(String username, String password, String email) {

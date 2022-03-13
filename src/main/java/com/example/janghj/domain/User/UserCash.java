@@ -31,8 +31,11 @@ public class UserCash {
         this.cash = 0;
     }
 
-    public void addUserCash(int cash) {
+    public void depositUserCash(int cash) {
         this.cash += cash;
+    }
+    public void withdrawalUserCash(int cash) {
+        this.cash -= cash;
     }
 
 }

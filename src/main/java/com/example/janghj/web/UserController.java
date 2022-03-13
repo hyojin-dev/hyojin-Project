@@ -2,7 +2,6 @@ package com.example.janghj.web;
 
 import com.example.janghj.config.jwt.JwtTokenUtil;
 import com.example.janghj.config.security.UserDetailsImpl;
-import com.example.janghj.domain.Address;
 import com.example.janghj.domain.User.User;
 import com.example.janghj.service.UserService;
 import com.example.janghj.web.dto.JwtTokenDto;
@@ -15,7 +14,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -57,8 +55,8 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @Operation(description = "로그인", method = "POST")
-    @PostMapping("/user/login")
+    @Operation(description = "로그인", method = "GET")
+    @GetMapping("/user")
     public ResponseEntity<?> loginUser(@RequestBody UserDto userDto) throws Exception {
         if (!userService.confirmPassword(userDto)) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -68,12 +66,12 @@ public class UserController {
         return ResponseEntity.ok(new JwtTokenDto(token, userDetails.getUsername()));
     }
 
-    @Operation(description = "유저 주소, 프로필사진 설정, 로그인 필요", method = "PUT")
-    @PutMapping("/user")
-    public User updateProfile(@AuthenticationPrincipal UserDetailsImpl nowUser, @RequestBody Address address,
-                              @RequestPart(name = "profileImgUrl", required = false) MultipartFile multipartFile) throws IOException {
-        return userService.setUserAddress(nowUser, address, multipartFile);
-    }
+//    @Operation(description = "유저 주소, 프로필사진 설정, 로그인 필요", method = "PUT")
+//    @PutMapping("/user")
+//    public User updateProfile(@AuthenticationPrincipal UserDetailsImpl nowUser, @RequestBody Address address,
+//                              @RequestPart(name = "profileImgUrl", required = false) MultipartFile multipartFile) throws IOException {
+//        return userService.setUserAddress(nowUser, address, multipartFile);
+//    }
 
     @Operation(description = "유저 현금 충전하기, 로그인 필요", method = "POST")
     @PostMapping("/user/cash")
@@ -107,7 +105,7 @@ public class UserController {
     //			"redirect_uri=http://localhost:8080/user/kakao/callback&response_type=code'">
     //	카카오로 로그인하기
     //    </button>
-    @GetMapping("/users/kakao")
+    @GetMapping("/user/kakao")
     public String kakaoLogin(String code) {
         userService.kakaoLogin(code);
         return "redirect:/";
