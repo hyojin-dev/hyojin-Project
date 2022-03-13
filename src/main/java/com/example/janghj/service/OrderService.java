@@ -4,6 +4,7 @@ import com.example.janghj.config.security.UserDetailsImpl;
 import com.example.janghj.domain.Delivery;
 import com.example.janghj.domain.Order;
 import com.example.janghj.domain.Product.Product;
+import com.example.janghj.domain.User.TypeOfCash;
 import com.example.janghj.domain.User.User;
 import com.example.janghj.repository.OrderRepository;
 import com.example.janghj.repository.ProductRepository;
@@ -43,8 +44,6 @@ public class OrderService {
         order.setDelivery(delivery);
         orderRepository.save(order);
 
-        userService.paymentUserCash(nowUser, order.getTotalAmount());
-
         return order;
     }
 
@@ -55,6 +54,15 @@ public class OrderService {
         int amount = product.getPrice() * quantity;
         return new OrderProduct(product, product.getPrice(), order, quantity, amount);
     }
+
+    public void payForTheOrder(UserDetailsImpl nowUser, Long orderId) {
+        Order order = getOrder(orderId);
+    }
+
+    public void payForTheOrders(UserDetailsImpl nowUser) {
+        List<Order> orders = getOrders(nowUser);
+    }
+
 
     public Order getOrder(Long orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(

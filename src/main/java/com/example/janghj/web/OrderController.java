@@ -3,7 +3,6 @@ package com.example.janghj.web;
 import com.example.janghj.config.security.UserDetailsImpl;
 import com.example.janghj.domain.Order;
 import com.example.janghj.service.OrderService;
-import com.example.janghj.service.UserService;
 import com.example.janghj.web.dto.OrderWebDto;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +24,33 @@ public class OrderController {
 //    416(처리할 수 없는 요청범위) return new ResponseEntity<>(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE);
 //    500(서버 오류) return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 
-    @Operation(description = "주문하기, 로그인 필요", method = "POST")
+    @Operation(description = "주문 하기, 로그인 필요, 결재 필요", method = "POST")
     @PostMapping("/order")
     public void order(@AuthenticationPrincipal UserDetailsImpl nowUser, @RequestBody OrderWebDto orderWebDto) {
+        orderService.order(nowUser, orderWebDto);
+    }
+
+    @Operation(description = "1개 주문 결재 하기, 로그인 필요,", method = "POST")
+    @PostMapping("/order/payment")
+    public void payForTheOrder(@AuthenticationPrincipal UserDetailsImpl nowUser, @PathVariable Long orderId) {
+        orderService.payForTheOrder(nowUser, orderId);
+    }
+
+    @Operation(description = "전체 주문 결재 하기, 로그인 필요,", method = "POST")
+    @PostMapping("/order/payment")
+    public void payForTheOrders(@AuthenticationPrincipal UserDetailsImpl nowUser, @PathVariable Long orderId) {
+        orderService.payForTheOrders(nowUser);
+    }
+
+    @Operation(description = "배송 시작, 로그인 필요", method = "POST")
+    @PostMapping("/order/delivery")
+    public void orderDeliveryStart(@AuthenticationPrincipal UserDetailsImpl nowUser, @RequestBody OrderWebDto orderWebDto) {
+        orderService.order(nowUser, orderWebDto);
+    }
+
+    @Operation(description = "배송 도착, 로그인 필요", method = "GET")
+    @GetMapping("/order/delivery")
+    public void DeliveryArrived(@AuthenticationPrincipal UserDetailsImpl nowUser, @RequestBody OrderWebDto orderWebDto) {
         orderService.order(nowUser, orderWebDto);
     }
 

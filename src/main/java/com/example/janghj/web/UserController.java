@@ -107,11 +107,10 @@ public class UserController {
     //			"redirect_uri=http://localhost:8080/user/kakao/callback&response_type=code'">
     //	카카오로 로그인하기
     //    </button>
-    @GetMapping("/user/kakao")
+    @GetMapping("/user/login/kakao")
     public String kakaoLogin(String code) {
         userService.kakaoLogin(code);
         return "redirect:/";
-
     }
 }
 

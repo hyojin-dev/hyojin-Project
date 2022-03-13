@@ -94,4 +94,12 @@ public class User extends Timestamped {
         this.profileImgUrl = profileImgUrl;
     }
 
+    public void howToPay(HowToPay howToPay) {
+        if (howToPay.getClass().equals(UserCash.class)) {
+
+        } else if (howToPay.getClass().equals(UserMileage.class)) {
+
+        }
+    }
+
 }

@@ -94,7 +94,7 @@ public class UserService {
     @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
     public UserCash depositUserCash(UserDetailsImpl nowUser, int readyCash) {
         UserCash userCash = userCashRepository.findByUserId(nowUser.getId()).orElseThrow(
-                () -> new NullPointerException("해당 사용자가 보유한 UserCash 을(를) 찾을 수 없습니다. userId = " + nowUser.getId()));
+                () -> new NullPointerException("해당 사용자가 보유한 캐시를(을) 찾을 수 없습니다. userId = " + nowUser.getId()));
         userCash.depositUserCash(readyCash);
         return userCash;
     }
@@ -102,7 +102,7 @@ public class UserService {
     @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
     public Boolean paymentUserCash(UserDetailsImpl nowUser, int paymentAmount) {
         UserCash userCash = userCashRepository.findByUserId(nowUser.getId()).orElseThrow(
-                () -> new NullPointerException("해당 사용자가 보유한 UserCash 을(를) 찾을 수 없습니다. userId = " + nowUser.getId()));
+                () -> new NullPointerException("해당 사용자가 보유한 캐시를(을) 찾을 수 없습니다. userId = " + nowUser.getId()));
 
         if (!nowUser.getId().equals(userCash.getUser().getId())) { // 현재 로그인 사용자 ID != 현금 충전하려는 사용자 ID 예외처리 및 대응 업데이트 예정
             throw new AccessDeniedException("유저(" + nowUser.getId() + ") 가 다른 유저(" + userCash.getUser().getId() + ")에 접근하여 캐쉬(을)를 수정하려고 합니다.");
@@ -116,22 +116,24 @@ public class UserService {
     @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
     public UserMileage depositUserMileage(UserDetailsImpl nowUser, int readyMileage) {
         UserMileage userMileage = userMileageRepository.findByUserId(nowUser.getId()).orElseThrow(
-                () -> new NullPointerException("해당 사용자가 보유한 UserMileage 을(를) 찾을 수 없습니다. userId = " + nowUser.getId()));
+                () -> new NullPointerException("해당 사용자가 보유한 마일리지를(을) 찾을 수 없습니다. userId = " + nowUser.getId()));
         userMileage.depositUserMileage(readyMileage);
         return userMileage;
     }
 
     @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
-    public UserMileage paymentUserMileage(UserDetailsImpl nowUser, int paymentAmount) {
+    public Boolean paymentUserMileage(UserDetailsImpl nowUser, int paymentAmount) {
         UserMileage userMileage = userMileageRepository.findByUserId(nowUser.getId()).orElseThrow(
-                () -> new NullPointerException("해당 사용자가 보유한 UserMileage 을(를) 찾을 수 없습니다. userId = " + nowUser.getId()));
+                () -> new NullPointerException("해당 사용자가 보유한 캐시를(을) 찾을 수 없습니다. userId = " + nowUser.getId()));
 
         if (!nowUser.getId().equals(userMileage.getUser().getId())) { // 현재 로그인 사용자 ID != 현금 충전하려는 사용자 ID 예외처리 및 대응 업데이트 예정
-            throw new AccessDeniedException("유저(" + nowUser.getId() + ") 가 다른 유저(" + userMileage.getUser().getId() + ")에 접근하여 마일리지(을)를 수정하려고 합니다.");
+            throw new AccessDeniedException("유저(" + nowUser.getId() + ") 가 다른 유저(" + userMileage.getUser().getId() + ")에 접근하여 캐쉬(을)를 수정하려고 합니다.");
         }
-        userMileage.withdrawalUserMileage(paymentAmount);
 
-        return userMileage;
+        if (userMileage.withdrawalUserMileage(paymentAmount)) {
+            return false;
+        }
+        return true;
     }
 
     @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable

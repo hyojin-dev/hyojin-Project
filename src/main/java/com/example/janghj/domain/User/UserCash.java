@@ -1,5 +1,6 @@
 package com.example.janghj.domain.User;
 
+import com.example.janghj.domain.Timestamped;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import static javax.persistence.FetchType.LAZY;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserCash {
+public class UserCash extends Timestamped implements HowToPay {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "usercash_id")// 반드시 값을 가지도록 합니다.
@@ -24,22 +25,22 @@ public class UserCash {
     private User user;
 
     @Column(nullable = false)
-    private int cash;
+    private int money;
 
     public UserCash(User user) {
         this.user = user;
-        this.cash = 0;
+        this.money = 0;
     }
 
     public void depositUserCash(int cash) {
-        this.cash += cash;
+        this.money += cash;
     }
 
     public Boolean withdrawalUserCash(int cash) {
-        if (this.cash < cash) {
+        if (this.money < cash) {
             return false;
         }
-        this.cash -= cash;
+        this.money -= cash;
         return true;
     }
 

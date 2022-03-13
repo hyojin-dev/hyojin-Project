@@ -32,6 +32,6 @@ public class Delivery extends Timestamped {
     public Delivery(Order order, Address address) {
         this.order = order;
         this.address = address;
-        this.status = DeliveryStatus.READY;
+        this.status = DeliveryStatus.WaitingForPayment;
     }
 }

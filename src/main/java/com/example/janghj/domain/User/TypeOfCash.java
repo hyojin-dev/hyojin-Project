@@ -1,4 +1,5 @@
 package com.example.janghj.domain.User;
 
-public interface HowToPay {
+public enum TypeOfCash {
+    Cash, Mileage
 }
