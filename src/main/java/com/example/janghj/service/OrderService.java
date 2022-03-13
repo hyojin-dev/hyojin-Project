@@ -1,10 +1,13 @@
 package com.example.janghj.service;
 
 import com.example.janghj.config.security.UserDetailsImpl;
+import com.example.janghj.domain.Address;
 import com.example.janghj.domain.Delivery;
+import com.example.janghj.domain.DeliveryStatus;
 import com.example.janghj.domain.Order;
 import com.example.janghj.domain.Product.Product;
 import com.example.janghj.domain.User.User;
+import com.example.janghj.domain.User.UserRole;
 import com.example.janghj.repository.DeliveryRepository;
 import com.example.janghj.repository.OrderRepository;
 import com.example.janghj.repository.ProductRepository;
@@ -16,38 +19,54 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class OrderService {
-    private final UserRepository userRepository;
     private final OrderRepository orderRepository;
-    private final DeliveryRepository deliveryRepository;
     private final ProductRepository productRepository;
+    private final UserRepository userRepository;
+    private final DeliveryRepository deliveryRepository;
 
 
     public void order(OrderWebDto orderWebDto) {
         List<OrderItem> productList = new ArrayList<>();
 
         orderWebDto.getOrderList().forEach((productId, quantity) ->
-                productList.add(createOrder(Long.parseLong((String) productId), (Integer) quantity)));
+//                productList.add(createOrder(Long.parseLong((String) productId), (Integer) quantity)));
 
-        Order order = new Order(productList);
-        Delivery delivery = new Delivery(order);
+        User user = User.builder()
+                .username("test")
+                .password("dsgsd")
+                .email("asgf")
+                .address(new Address("city", "street", "zipcode"))
+                .userRole(UserRole.USER)
+                .build();
+        userRepository.save(user);
+        User user1 = userRepository.findById(1L).orElseThrow(
+                () -> new NullPointerException("해당 사용자가 없습니다. userName = " )
+        );
+
+        Delivery delivery = new Delivery(new Address("city", "street", "zipcode"), DeliveryStatus.READY);
+        deliveryRepository.save(delivery);
+        Order order = new Order(user1, productList, delivery);
+        orderRepository.save(order);
+
+//        Delivery delivery = new Delivery(order);
 
 //        orderDto.getOrderList().forEach((productId, quantity) ->
 //                productList.add((Product) productRepository.getById(productId))
 //        );
 
 //        orderDto.getOrderList().forEach((productId, quantity) ->
-//                createOrder(Long.parseLong((String) productId), (Integer) quantity));
+//                createOrder(Long.parseLong((String) productId), (Integer) quantity)
+//                );
     }
 
-    public OrderItem createOrder(Long productId, int quantity) {
-        Product product = (Product) productRepository.getById(productId);
-        return new OrderItem(product, quantity);
-    }
+//    public OrderItem createOrder(Long productId, int quantity) {
+//        Product product = (Product) productRepository.getById(productId);
+////        Product productId, Order order, int orderPrice, int count
+//    }
 
     public Order getOrder(Long orderId) {
         return orderRepository.findById(orderId).orElseThrow(

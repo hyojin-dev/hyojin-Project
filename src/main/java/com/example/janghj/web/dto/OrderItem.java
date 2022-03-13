@@ -35,8 +35,10 @@ public class OrderItem {
     private int orderPrice; //주문 가격
     private int count; //주문 수량
 
-    public OrderItem(Product productId, int count) {
+    public OrderItem(Product productId, Order order, int orderPrice, int count) {
         this.productId = productId;
+        this.order = order;
+        this.orderPrice = orderPrice;
         this.count = count;
     }
 }

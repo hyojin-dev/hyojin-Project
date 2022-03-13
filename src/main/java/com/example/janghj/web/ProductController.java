@@ -48,8 +48,8 @@ public class ProductController {
 
     @Operation(description = "특정 상품 조회하기(단품)", method = "GET")
     @GetMapping("/product")
-    public void getProduct(@PathVariable Long id) {
-        productService.getProduct(id);
+    public Product getProduct(@PathVariable Long id) {
+        return productService.getProduct(id);
     }
 
     @Operation(description = "상품 조회하기(카테고리 검색 + 최신순)", method = "GET")

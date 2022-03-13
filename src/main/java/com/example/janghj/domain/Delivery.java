@@ -29,7 +29,8 @@ public class Delivery extends Timestamped {
     @Enumerated(EnumType.STRING)
     private DeliveryStatus status; //READY, COMP
 
-    public Delivery(Order order) {
-        this.order = order;
+    public Delivery(Address address, DeliveryStatus status) {
+        this.address = address;
+        this.status = status;
     }
 }

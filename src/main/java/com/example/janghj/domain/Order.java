@@ -30,21 +30,17 @@ public class Order extends Timestamped {
     private User user;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderItem> orderProducts = new ArrayList<>();
+    private List<OrderItem> orderProducts;
 
     @OneToOne(fetch = LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "delivery_id")
     private Delivery delivery;
 
-
-    public Order(User user, Delivery delivery) {
-        this.user = user;
-        this.delivery = delivery;
-    }
-
     //    Test 용도
 
-    public Order(List<OrderItem> orderProducts) {
+    public Order(User user, List<OrderItem> orderProducts, Delivery delivery) {
+        this.user = user;
         this.orderProducts = orderProducts;
+        this.delivery = delivery;
     }
 }
