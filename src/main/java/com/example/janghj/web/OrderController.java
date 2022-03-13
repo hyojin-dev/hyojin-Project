@@ -19,16 +19,16 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
-    private final UserService userService;
 
 //    401(권한 없음) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 //    402(결제 필요) return new ResponseEntity<>(HttpStatus.PAYMENT_REQUIRED);
+//    416(처리할 수 없는 요청범위) return new ResponseEntity<>(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE);
 //    500(서버 오류) return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 
     @Operation(description = "주문하기, 로그인 필요", method = "POST")
     @PostMapping("/order")
-    public void order(@RequestBody OrderWebDto orderWebDto) {
-        orderService.order(orderWebDto);
+    public void order(@AuthenticationPrincipal UserDetailsImpl nowUser, @RequestBody OrderWebDto orderWebDto) {
+        orderService.order(nowUser, orderWebDto);
     }
 
     @Operation(description = "주문 1개 조회하기 , 로그인 필요", method = "GET")
@@ -43,8 +43,8 @@ public class OrderController {
         return orderService.getOrders(nowUser);
     }
 
-    @Operation(description = "주문취소, 로그인 필요", method = "DELETE")
-    @DeleteMapping("/order")
+    @Operation(description = "주문 취소, 로그인 필요", method = "DELETE")
+    @DeleteMapping("/order/{orderId}")
     public ResponseEntity<?> orderCancel(@PathVariable Long orderId) {
         try {
             orderService.orderCancel(orderId);

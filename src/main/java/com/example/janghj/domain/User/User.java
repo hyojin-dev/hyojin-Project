@@ -62,12 +62,13 @@ public class User extends Timestamped {
     private List<UserLikes> userLike;
 
     @Builder
-    public User(String username, String password, String email, Address address ) {
+    public User(String username, String password, String email, Address address) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.address = address;
-        this.role = UserRole.USER;;
+        this.role = UserRole.USER;
+        ;
     }
 
     public User(String username, String password, String email) {
@@ -92,4 +93,5 @@ public class User extends Timestamped {
     public void setProfileImgUrl(String profileImgUrl) {
         this.profileImgUrl = profileImgUrl;
     }
+
 }

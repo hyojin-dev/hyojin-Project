@@ -27,14 +27,11 @@ public class S3Manager {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket; // S3 버킷 이름
 
-    public String upload(String dirName, List<MultipartFile> multipartFile) throws IOException {
+    public String upload(MultipartFile multipartFile, String dirName) throws IOException {
+        File uploadFile = convert(multipartFile)
+                .orElseThrow(() -> new IllegalArgumentException("MultipartFile -> File 변환 실패"));
 
-        String[] numbers = {"one", "two", "three"};
-        for(String number: numbers) {
-//            스트림을 이용하여 사진 여러개 S3 업로드 구현
-        }
-        return "string";
-//        return upload(uploadFile, dirName);
+        return upload(uploadFile, dirName);
     }
 
     private String upload(File uploadFile, String dirName) {

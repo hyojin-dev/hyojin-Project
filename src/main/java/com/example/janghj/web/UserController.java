@@ -2,6 +2,7 @@ package com.example.janghj.web;
 
 import com.example.janghj.config.jwt.JwtTokenUtil;
 import com.example.janghj.config.security.UserDetailsImpl;
+import com.example.janghj.domain.Address;
 import com.example.janghj.domain.User.User;
 import com.example.janghj.service.UserService;
 import com.example.janghj.web.dto.JwtTokenDto;
@@ -14,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -66,12 +68,12 @@ public class UserController {
         return ResponseEntity.ok(new JwtTokenDto(token, userDetails.getUsername()));
     }
 
-//    @Operation(description = "유저 주소, 프로필사진 설정, 로그인 필요", method = "PUT")
-//    @PutMapping("/user")
-//    public User updateProfile(@AuthenticationPrincipal UserDetailsImpl nowUser, @RequestBody Address address,
-//                              @RequestPart(name = "profileImgUrl", required = false) MultipartFile multipartFile) throws IOException {
-//        return userService.setUserAddress(nowUser, address, multipartFile);
-//    }
+    @Operation(description = "유저 주소, 프로필사진 설정, 로그인 필요", method = "PUT")
+    @PutMapping("/user")
+    public User updateProfile(@AuthenticationPrincipal UserDetailsImpl nowUser, @RequestBody Address address,
+                              @RequestPart(name = "profileImgUrl", required = false) MultipartFile multipartFile) throws IOException {
+        return userService.setUserAddress(nowUser, address, multipartFile);
+    }
 
     @Operation(description = "유저 현금 충전하기, 로그인 필요", method = "POST")
     @PostMapping("/user/cash")

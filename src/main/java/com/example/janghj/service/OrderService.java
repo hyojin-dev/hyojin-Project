@@ -5,7 +5,6 @@ import com.example.janghj.domain.Delivery;
 import com.example.janghj.domain.Order;
 import com.example.janghj.domain.Product.Product;
 import com.example.janghj.domain.User.User;
-import com.example.janghj.repository.DeliveryRepository;
 import com.example.janghj.repository.OrderRepository;
 import com.example.janghj.repository.ProductRepository;
 import com.example.janghj.repository.UserRepository;
@@ -24,10 +23,9 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
-    private final DeliveryRepository deliveryRepository;
+    private final UserService userService;
 
-
-    public void order(OrderWebDto orderWebDto) {
+    public Order order(UserDetailsImpl nowUser, OrderWebDto orderWebDto) {
 //        User user = userRepository.findById(nowUser.getId()).orElseThrow(
 //                () -> new NullPointerException("해당 유저가 존재하지 않습니다. id  = " + nowUser.getId()));
 
@@ -35,7 +33,6 @@ public class OrderService {
                 () -> new NullPointerException("해당 유저가 존재하지 않습니다. id  = " + 1L));
 
         Order order = new Order(user);
-        orderRepository.save(order);
 
         List<OrderProduct> orderProducts = new ArrayList<>();
         orderWebDto.getOrderList().forEach((productId, quantity) ->
@@ -45,6 +42,10 @@ public class OrderService {
         Delivery delivery = new Delivery(order, user.getAddress());
         order.setDelivery(delivery);
         orderRepository.save(order);
+
+        userService.paymentUserCash(nowUser, order.getTotalAmount());
+
+        return order;
     }
 
     @SneakyThrows // try-catch 기능을 대체해줌
@@ -56,9 +57,10 @@ public class OrderService {
     }
 
     public Order getOrder(Long orderId) {
-        return orderRepository.findById(orderId).orElseThrow(
+        Order order = orderRepository.findById(orderId).orElseThrow(
                 () -> new NullPointerException("해당 주문이 존재하지 않습니다. itemId = " + orderId)
         );
+        return order;
     }
 
     public List<Order> getOrders(UserDetailsImpl nowUser) {

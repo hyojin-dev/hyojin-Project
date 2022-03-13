@@ -3,6 +3,8 @@ package com.example.janghj.service;
 import com.example.janghj.config.security.UserDetailsImpl;
 import com.example.janghj.config.security.kakao.KakaoOAuth2;
 import com.example.janghj.config.security.kakao.KakaoUserInfo;
+import com.example.janghj.config.util.S3Manager;
+import com.example.janghj.domain.Address;
 import com.example.janghj.domain.User.User;
 import com.example.janghj.domain.User.UserCash;
 import com.example.janghj.domain.User.UserMileage;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -34,7 +37,7 @@ public class UserService {
     private final UserCashRepository userCashRepository;
     private final UserMileageRepository userMileageRepository;
 
-    //    private final S3Manager s3Manager;
+    private final S3Manager s3Manager;
     private final KakaoOAuth2 kakaoOAuth2;
     private final AuthenticationManager authenticationManager;
 
@@ -97,16 +100,17 @@ public class UserService {
     }
 
     @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
-    public UserCash paymentUserCash(UserDetailsImpl nowUser, int paymentAmount) {
+    public Boolean paymentUserCash(UserDetailsImpl nowUser, int paymentAmount) {
         UserCash userCash = userCashRepository.findByUserId(nowUser.getId()).orElseThrow(
                 () -> new NullPointerException("해당 사용자가 보유한 UserCash 을(를) 찾을 수 없습니다. userId = " + nowUser.getId()));
 
         if (!nowUser.getId().equals(userCash.getUser().getId())) { // 현재 로그인 사용자 ID != 현금 충전하려는 사용자 ID 예외처리 및 대응 업데이트 예정
             throw new AccessDeniedException("유저(" + nowUser.getId() + ") 가 다른 유저(" + userCash.getUser().getId() + ")에 접근하여 캐쉬(을)를 수정하려고 합니다.");
         }
-        userCash.withdrawalUserCash(paymentAmount);
-
-        return userCash;
+        if (userCash.withdrawalUserCash(paymentAmount)) {
+            return false;
+        }
+        return true;
     }
 
     @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
@@ -130,20 +134,21 @@ public class UserService {
         return userMileage;
     }
 
-//    @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
-//    public User setUserAddress(UserDetailsImpl nowUser, Address address, MultipartFile multipartFile) {
-//        User user = userRepository.findById(nowUser.getId()).orElseThrow(
-//                () -> new NullPointerException("해당 사용자가 없습니다. userId =" + nowUser.getId()));
-//
-//        if (address != null) {
-//            user.setAddress(address);
-//        }
-//        if (multipartFile != null) {
-////            s3 연동 로직 예정
-//        }
-//        userRepository.save(user);
-//        return user;
-//    }
+    @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
+    public User setUserAddress(UserDetailsImpl nowUser, Address address, MultipartFile multipartFile) throws IOException {
+        User user = userRepository.findById(nowUser.getId()).orElseThrow(
+                () -> new NullPointerException("해당 사용자가 없습니다. userId =" + nowUser.getId()));
+
+        if (address != null) {
+            user.setAddress(address);
+        }
+        if (multipartFile != null) {
+            String profileImgUrl = s3Manager.upload(multipartFile, "profile"); // S3 profile 폴더에 저장하고 클라우드 프론트 url 반환
+            user.setProfileImgUrl(profileImgUrl);
+        }
+        userRepository.save(user);
+        return user;
+    }
 
     public void kakaoLogin(String authorizedCode) {
         // 카카오 OAuth2 를 통해 카카오 사용자 정보 조회

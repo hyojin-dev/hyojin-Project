@@ -34,8 +34,13 @@ public class UserCash {
     public void depositUserCash(int cash) {
         this.cash += cash;
     }
-    public void withdrawalUserCash(int cash) {
+
+    public Boolean withdrawalUserCash(int cash) {
+        if (this.cash < cash) {
+            return false;
+        }
         this.cash -= cash;
+        return true;
     }
 
 }
