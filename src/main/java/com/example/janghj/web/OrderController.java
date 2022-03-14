@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,41 +38,43 @@ public class OrderController {
     }
 
     @Operation(description = "전체 주문 결재 하기, 로그인 필요,", method = "POST")
-    @PostMapping("/order/payment")
-    public void payForTheOrders(@AuthenticationPrincipal UserDetailsImpl nowUser, @PathVariable Long orderId) {
+    @PostMapping("/orders/payment")
+    public void payForTheOrders(@AuthenticationPrincipal UserDetailsImpl nowUser) {
         orderService.payForTheOrders(nowUser);
     }
 
     @Operation(description = "배송 시작, 로그인 필요", method = "POST")
     @PostMapping("/order/delivery")
-    public void orderDeliveryStart(@AuthenticationPrincipal UserDetailsImpl nowUser, @RequestBody OrderWebDto orderWebDto) {
-        orderService.order(nowUser, orderWebDto);
+    public void orderDeliveryStart(@AuthenticationPrincipal UserDetailsImpl nowUser) {
+        orderService.deliveryStart(nowUser);
     }
 
     @Operation(description = "배송 도착, 로그인 필요", method = "GET")
     @GetMapping("/order/delivery")
-    public void DeliveryArrived(@AuthenticationPrincipal UserDetailsImpl nowUser, @RequestBody OrderWebDto orderWebDto) {
-        orderService.order(nowUser, orderWebDto);
+    public void orderDeliveryArrived(@AuthenticationPrincipal UserDetailsImpl nowUser) {
+        orderService.deliveryArrive(nowUser);
     }
 
     @Operation(description = "주문 1개 조회하기 , 로그인 필요", method = "GET")
     @GetMapping("/order/{orderId}")
-    public void getOrder(@PathVariable Long orderId) {
-        orderService.getOrder(orderId);
+    public void findByOrder(@PathVariable Long orderId) {
+        orderService.findByOrder(orderId);
     }
 
     @Operation(description = "나의 주문 전체 보기 , 로그인 필요", method = "GET")
     @GetMapping("/orders")
-    public List<Order> cancelOrder(@AuthenticationPrincipal UserDetailsImpl nowUser) {
-        return orderService.getOrders(nowUser);
+    public List<Order> findByOrders(@AuthenticationPrincipal UserDetailsImpl nowUser) {
+        return orderService.findByOrders(nowUser);
     }
 
     @Operation(description = "주문 취소, 로그인 필요", method = "DELETE")
     @DeleteMapping("/order/{orderId}")
-    public ResponseEntity<?> orderCancel(@PathVariable Long orderId) {
+    public ResponseEntity<?> orderCancel(@AuthenticationPrincipal UserDetailsImpl nowUser, @PathVariable Long orderId) {
         try {
-            orderService.orderCancel(orderId);
+            orderService.orderCancel(nowUser, orderId);
             return new ResponseEntity<>(HttpStatus.OK);
+        } catch (AccessDeniedException e) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

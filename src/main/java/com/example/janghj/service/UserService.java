@@ -113,7 +113,7 @@ public class UserService {
         return true;
     }
 
-    @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
+    @Transactional(readOnly = true, rollbackFor = Throwable.class)
     public UserMileage depositUserMileage(UserDetailsImpl nowUser, int readyMileage) {
         UserMileage userMileage = userMileageRepository.findByUserId(nowUser.getId()).orElseThrow(
                 () -> new NullPointerException("해당 사용자가 보유한 마일리지를(을) 찾을 수 없습니다. userId = " + nowUser.getId()));
@@ -121,7 +121,7 @@ public class UserService {
         return userMileage;
     }
 
-    @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
+    @Transactional(readOnly = true, rollbackFor = Throwable.class)
     public Boolean paymentUserMileage(UserDetailsImpl nowUser, int paymentAmount) {
         UserMileage userMileage = userMileageRepository.findByUserId(nowUser.getId()).orElseThrow(
                 () -> new NullPointerException("해당 사용자가 보유한 캐시를(을) 찾을 수 없습니다. userId = " + nowUser.getId()));
@@ -136,7 +136,7 @@ public class UserService {
         return true;
     }
 
-    @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
+    @Transactional(readOnly = true, rollbackFor = Throwable.class)
     public User setUserAddress(UserDetailsImpl nowUser, Address address, MultipartFile multipartFile) throws IOException {
         User user = userRepository.findById(nowUser.getId()).orElseThrow(
                 () -> new NullPointerException("해당 사용자가 없습니다. userId =" + nowUser.getId()));
