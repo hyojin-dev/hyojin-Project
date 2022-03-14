@@ -2,9 +2,11 @@ package com.example.janghj.service;
 
 import com.example.janghj.config.security.UserDetailsImpl;
 import com.example.janghj.domain.Delivery;
+import com.example.janghj.domain.DeliveryStatus;
 import com.example.janghj.domain.Order;
 import com.example.janghj.domain.Product.Product;
 import com.example.janghj.domain.User.User;
+import com.example.janghj.domain.User.UserCash;
 import com.example.janghj.repository.OrderRepository;
 import com.example.janghj.repository.ProductRepository;
 import com.example.janghj.repository.UserRepository;
@@ -31,9 +33,6 @@ public class OrderService {
         User user = userRepository.findById(nowUser.getId()).orElseThrow(
                 () -> new NullPointerException("해당 유저가 존재하지 않습니다. id  = " + nowUser.getId()));
 
-//        User user = userRepository.findById(1L).orElseThrow(
-//                () -> new NullPointerException("해당 유저가 존재하지 않습니다. id  = " + 1L));
-
         Order order = new Order(user);
 
         List<OrderProduct> orderProducts = new ArrayList<>();
@@ -48,7 +47,7 @@ public class OrderService {
         return order;
     }
 
-    @SneakyThrows // try-catch 기능을 대체해줌
+    @SneakyThrows // 예외 처리 기능
     @Transactional(readOnly = true, rollbackFor = Throwable.class)
     public OrderProduct createOrder(Long productId, int quantity, Order order) {
         Product product = (Product) productRepository.findById(productId).orElseThrow(
@@ -59,14 +58,39 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true, rollbackFor = Throwable.class)
-    public void payForTheOrder(UserDetailsImpl nowUser, Long orderId) {
-        findByOrder(orderId);
+    public Order payForTheOrder(UserDetailsImpl nowUser, Long orderId) throws Exception {
+        Order order = findByOrder(nowUser, orderId);
+        User user = nowUser.getUser();
+
+        canIBuyThis(user.getUserCash(), order);
+
+        user.payForIt(order.getTotalAmount());
+
+        order.getDelivery().setStatus(DeliveryStatus.PaymentCompleted);
+        return order;
     }
 
     @Transactional(readOnly = true, rollbackFor = Throwable.class)
     public void payForTheOrders(UserDetailsImpl nowUser) {
+        int totalAmount = 0;
+        List<Order> orders = findByOrders(nowUser);
+        User user = nowUser.getUser();
 
+        for (Order order : orders) {
+            totalAmount += order.getTotalAmount();
+            order.getDelivery().setStatus(DeliveryStatus.PaymentCompleted);
+            canIBuyThis(user.getUserCash(), order);
+        }
+        user.payForIt(totalAmount);
     }
+
+    public Boolean canIBuyThis(UserCash userCash, Order order) {
+        if (userCash.getMoney() < order.getTotalAmount()) {
+            throw new ArithmeticException();
+        }
+        return true;
+    }
+
 
     @Transactional(readOnly = true, rollbackFor = Throwable.class)
     public void deliveryStart(UserDetailsImpl nowUser) {
@@ -79,10 +103,15 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true, rollbackFor = Throwable.class)
-    public Order findByOrder(Long orderId) {
+    public Order findByOrder(UserDetailsImpl nowUser, Long orderId) {
+        if (!nowUser.getUser().equals(nowUser.getUser())) {
+            throw new AccessDeniedException("유저(" + nowUser.getId() + ") 가 다른 유저(" + nowUser.getUser().getId() + ")에 접근하려고 합니다.");
+        }
+
         Order order = orderRepository.findById(orderId).orElseThrow(
                 () -> new NullPointerException("해당 주문이 존재하지 않습니다. itemId = " + orderId)
         );
+
         return order;
     }
 
@@ -92,13 +121,9 @@ public class OrderService {
 
     @Transactional(readOnly = true, rollbackFor = Throwable.class)
     public void orderCancel(UserDetailsImpl nowUser, Long orderId) {
-        Order deleteOrder = orderRepository.findById(orderId).orElseThrow(
-                () -> new NullPointerException("해당 주문이 존재하지 않습니다. itemId = " + orderId)
+        orderRepository.findById(orderId).orElseThrow(
+                () -> new NullPointerException("해당 주문이 존재하지 않습니다. orderId = " + orderId)
         );
-
-        if (!deleteOrder.getUser().equals(nowUser.getUser())) {
-            throw new AccessDeniedException("유저(" + nowUser.getId() + ") 가 다른 유저(" + deleteOrder.getUser().getId() + ")에 접근하여 주문을 삭제하려고 합니다.");
-        }
 
         orderRepository.deleteById(orderId);
 

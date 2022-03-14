@@ -1,6 +1,5 @@
 package com.example.janghj.domain;
 
-import com.example.janghj.domain.User.TypeOfCash;
 import com.example.janghj.domain.User.User;
 import com.example.janghj.web.dto.OrderProduct;
 import lombok.AccessLevel;
@@ -35,8 +34,6 @@ public class Order extends Timestamped {
     @OneToOne(fetch = LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "delivery_id")
     private Delivery delivery;
-
-    private TypeOfCash typeOfCash;
 
     public Order(User user) {
         this.user = user;

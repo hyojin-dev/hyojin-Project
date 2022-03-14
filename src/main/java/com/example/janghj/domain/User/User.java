@@ -51,10 +51,6 @@ public class User extends Timestamped {
     private UserCash userCash;
 
     @JsonIgnore
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private UserMileage userMileage;
-
-    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserCoupon> userCoupon = new ArrayList<>();
 
@@ -94,12 +90,8 @@ public class User extends Timestamped {
         this.profileImgUrl = profileImgUrl;
     }
 
-    public void howToPay(HowToPay howToPay) {
-        if (howToPay.getClass().equals(UserCash.class)) {
-
-        } else if (howToPay.getClass().equals(UserMileage.class)) {
-
-        }
+    public void payForIt(int amount) {
+        userCash.withdrawalUserCash(amount);
     }
 
 }

@@ -22,6 +22,7 @@ public class OrderController {
 
 //    401(권한 없음) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 //    402(결제 필요) return new ResponseEntity<>(HttpStatus.PAYMENT_REQUIRED);
+//    404(값이 없음) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 //    416(처리할 수 없는 요청범위) return new ResponseEntity<>(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE);
 //    500(서버 오류) return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 
@@ -31,10 +32,46 @@ public class OrderController {
         orderService.order(nowUser, orderWebDto);
     }
 
+    @Operation(description = "나의 주문 1개 조회하기 , 로그인 필요", method = "GET")
+    @GetMapping("/order/{orderId}")
+    public void findByOrder(@AuthenticationPrincipal UserDetailsImpl nowUser, @PathVariable Long orderId) {
+        orderService.findByOrder(nowUser, orderId);
+    }
+
+    @Operation(description = "주문 취소, 로그인 필요", method = "DELETE")
+    @DeleteMapping("/order/{orderId}")
+    public ResponseEntity<?> orderCancel(@AuthenticationPrincipal UserDetailsImpl nowUser, @PathVariable Long orderId) {
+        try {
+            orderService.orderCancel(nowUser, orderId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (AccessDeniedException e) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Operation(description = "나의 주문 전체 보기 , 로그인 필요", method = "GET")
+    @GetMapping("/orders")
+    public List<Order> findByOrders(@AuthenticationPrincipal UserDetailsImpl nowUser) {
+        return orderService.findByOrders(nowUser);
+    }
+
     @Operation(description = "1개 주문 결재 하기, 로그인 필요,", method = "POST")
     @PostMapping("/order/payment")
-    public void payForTheOrder(@AuthenticationPrincipal UserDetailsImpl nowUser, @PathVariable Long orderId) {
-        orderService.payForTheOrder(nowUser, orderId);
+    public ResponseEntity<?> payForTheOrder(@AuthenticationPrincipal UserDetailsImpl nowUser, @PathVariable Long orderId) {
+        try { // AOP 작업 예정
+            orderService.payForTheOrder(nowUser, orderId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (ArithmeticException e) { // 결재 금액 부족
+            return new ResponseEntity<>(HttpStatus.PAYMENT_REQUIRED);
+        } catch (AccessDeniedException e) { // 권한 없음
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (NullPointerException e) { // 찾는 값이 없음
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Throwable e) { // 알 수 없는 에러(개발자가 예상하지 못한 에러는 생기지 않도록 한다.)
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Operation(description = "전체 주문 결재 하기, 로그인 필요,", method = "POST")
@@ -53,30 +90,5 @@ public class OrderController {
     @GetMapping("/order/delivery")
     public void orderDeliveryArrived(@AuthenticationPrincipal UserDetailsImpl nowUser) {
         orderService.deliveryArrive(nowUser);
-    }
-
-    @Operation(description = "주문 1개 조회하기 , 로그인 필요", method = "GET")
-    @GetMapping("/order/{orderId}")
-    public void findByOrder(@PathVariable Long orderId) {
-        orderService.findByOrder(orderId);
-    }
-
-    @Operation(description = "나의 주문 전체 보기 , 로그인 필요", method = "GET")
-    @GetMapping("/orders")
-    public List<Order> findByOrders(@AuthenticationPrincipal UserDetailsImpl nowUser) {
-        return orderService.findByOrders(nowUser);
-    }
-
-    @Operation(description = "주문 취소, 로그인 필요", method = "DELETE")
-    @DeleteMapping("/order/{orderId}")
-    public ResponseEntity<?> orderCancel(@AuthenticationPrincipal UserDetailsImpl nowUser, @PathVariable Long orderId) {
-        try {
-            orderService.orderCancel(nowUser, orderId);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (AccessDeniedException e) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 }

@@ -7,10 +7,8 @@ import com.example.janghj.config.util.S3Manager;
 import com.example.janghj.domain.Address;
 import com.example.janghj.domain.User.User;
 import com.example.janghj.domain.User.UserCash;
-import com.example.janghj.domain.User.UserMileage;
 import com.example.janghj.domain.User.UserRole;
 import com.example.janghj.repository.UserCashRepository;
-import com.example.janghj.repository.UserMileageRepository;
 import com.example.janghj.repository.UserRepository;
 import com.example.janghj.web.dto.UserDto;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +33,6 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final UserCashRepository userCashRepository;
-    private final UserMileageRepository userMileageRepository;
 
     private final S3Manager s3Manager;
     private final KakaoOAuth2 kakaoOAuth2;
@@ -60,7 +57,6 @@ public class UserService {
         userRepository.save(user);
 
         userCashRepository.save(new UserCash(user));
-        userMileageRepository.save(new UserMileage(user));
         return user;
     }
 
@@ -91,7 +87,7 @@ public class UserService {
                 () -> new NullPointerException("해당 사용자가 없습니다. userId =" + nowUser.getId()));
     }
 
-    @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
+    @Transactional(rollbackFor = Throwable.class)
     public UserCash depositUserCash(UserDetailsImpl nowUser, int readyCash) {
         UserCash userCash = userCashRepository.findByUserId(nowUser.getId()).orElseThrow(
                 () -> new NullPointerException("해당 사용자가 보유한 캐시를(을) 찾을 수 없습니다. userId = " + nowUser.getId()));
@@ -99,41 +95,16 @@ public class UserService {
         return userCash;
     }
 
-    @Transactional(rollbackFor = Throwable.class) // default : Unchecked Exception -> Throwable
-    public Boolean paymentUserCash(UserDetailsImpl nowUser, int paymentAmount) {
+    @Transactional(rollbackFor = Throwable.class)
+    public UserCash paymentUserCash(UserDetailsImpl nowUser, int paymentAmount) {
         UserCash userCash = userCashRepository.findByUserId(nowUser.getId()).orElseThrow(
                 () -> new NullPointerException("해당 사용자가 보유한 캐시를(을) 찾을 수 없습니다. userId = " + nowUser.getId()));
 
         if (!nowUser.getId().equals(userCash.getUser().getId())) { // 현재 로그인 사용자 ID != 현금 충전하려는 사용자 ID 예외처리 및 대응 업데이트 예정
             throw new AccessDeniedException("유저(" + nowUser.getId() + ") 가 다른 유저(" + userCash.getUser().getId() + ")에 접근하여 캐쉬(을)를 수정하려고 합니다.");
         }
-        if (userCash.withdrawalUserCash(paymentAmount)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Transactional(readOnly = true, rollbackFor = Throwable.class)
-    public UserMileage depositUserMileage(UserDetailsImpl nowUser, int readyMileage) {
-        UserMileage userMileage = userMileageRepository.findByUserId(nowUser.getId()).orElseThrow(
-                () -> new NullPointerException("해당 사용자가 보유한 마일리지를(을) 찾을 수 없습니다. userId = " + nowUser.getId()));
-        userMileage.depositUserMileage(readyMileage);
-        return userMileage;
-    }
-
-    @Transactional(readOnly = true, rollbackFor = Throwable.class)
-    public Boolean paymentUserMileage(UserDetailsImpl nowUser, int paymentAmount) {
-        UserMileage userMileage = userMileageRepository.findByUserId(nowUser.getId()).orElseThrow(
-                () -> new NullPointerException("해당 사용자가 보유한 캐시를(을) 찾을 수 없습니다. userId = " + nowUser.getId()));
-
-        if (!nowUser.getId().equals(userMileage.getUser().getId())) { // 현재 로그인 사용자 ID != 현금 충전하려는 사용자 ID 예외처리 및 대응 업데이트 예정
-            throw new AccessDeniedException("유저(" + nowUser.getId() + ") 가 다른 유저(" + userMileage.getUser().getId() + ")에 접근하여 캐쉬(을)를 수정하려고 합니다.");
-        }
-
-        if (userMileage.withdrawalUserMileage(paymentAmount)) {
-            return false;
-        }
-        return true;
+        userCash.withdrawalUserCash(paymentAmount);
+        return userCash;
     }
 
     @Transactional(readOnly = true, rollbackFor = Throwable.class)

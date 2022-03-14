@@ -28,4 +28,13 @@ public class UserCoupon extends Timestamped {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    public UserCoupon(String couponName, int rateDiscount, User user) {
+        this.couponName = couponName;
+        if (rateDiscount > 100) {
+            return;
+        }
+        this.RateDiscount = rateDiscount;
+        this.user = user;
+    }
 }

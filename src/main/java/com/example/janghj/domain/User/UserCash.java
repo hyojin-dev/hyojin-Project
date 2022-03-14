@@ -13,7 +13,7 @@ import static javax.persistence.FetchType.LAZY;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserCash extends Timestamped implements HowToPay {
+public class UserCash extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "usercash_id")// 반드시 값을 가지도록 합니다.
@@ -36,12 +36,11 @@ public class UserCash extends Timestamped implements HowToPay {
         this.money += cash;
     }
 
-    public Boolean withdrawalUserCash(int cash) {
-        if (this.money < cash) {
-            return false;
+    public void withdrawalUserCash(int amount) {
+        if (this.money < amount) {
+            throw new ArithmeticException();
         }
-        this.money -= cash;
-        return true;
+        this.money -= amount;
     }
 
 }

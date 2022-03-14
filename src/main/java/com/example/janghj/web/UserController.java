@@ -89,19 +89,6 @@ public class UserController {
         }
     }
 
-    @Operation(description = "유저 마일리지 추가하기, 로그인 필요", method = "POST")
-    @PostMapping("/user/mileage")
-    public ResponseEntity<?> addUserMileage(@AuthenticationPrincipal UserDetailsImpl nowUser, @RequestPart(required = false) int readyMileage) throws IOException {
-        try {
-            userService.depositUserMileage(nowUser, readyMileage);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (NullPointerException e) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        } catch (Throwable ex) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     //   <button id="login-kakao-btn"
     //	onclick="location.href='https://kauth.kakao.com/oauth/authorize?client_id=e81c288c3e5afca68f122b4db3bc314f&" +
     //			"redirect_uri=http://localhost:8080/user/kakao/callback&response_type=code'">
