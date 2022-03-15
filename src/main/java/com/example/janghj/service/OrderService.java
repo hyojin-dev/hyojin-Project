@@ -117,7 +117,7 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true, rollbackFor = Throwable.class)
-    public void deliveryArrive(UserDetailsImpl nowUser) {
+    public void orderDeliveryArrived(UserDetailsImpl nowUser) {
 
     }
 

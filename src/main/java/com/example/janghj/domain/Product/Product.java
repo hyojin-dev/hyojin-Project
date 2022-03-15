@@ -3,6 +3,7 @@ package com.example.janghj.domain.Product;
 import com.example.janghj.domain.Category;
 import com.example.janghj.domain.Order;
 import com.example.janghj.domain.Timestamped;
+import com.example.janghj.web.dto.ProductDto;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,5 +48,13 @@ public abstract class Product extends Timestamped {
         this.stockQuantity = stockQuantity;
         this.category = category;
         this.productColor = productColor;
+    }
+
+    public void updateProduct(ProductDto productDto) {
+        this.name = productDto.getName();
+        this.price = productDto.getPrice();
+        this.stockQuantity = productDto.getStockQuantity();
+        this.category = productDto.getCategory();
+        this.productColor = productDto.getProductColor();
     }
 }

@@ -5,6 +5,7 @@ import com.example.janghj.domain.Category;
 import com.example.janghj.domain.Product.Product;
 import com.example.janghj.domain.User.UserRole;
 import com.example.janghj.repository.ProductRepository;
+import com.example.janghj.web.dto.ProductDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -17,17 +18,20 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
-//    401(권한 없음) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-//    402(결제 필요) return new ResponseEntity<>(HttpStatus.PAYMENT_REQUIRED);
-//    500(서버 오류) return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-
-    public Product getProduct(Long id) {
-        Product product = (Product) productRepository.getById(id);
+    public Product getProduct(Long productId) {
+        Product product = (Product) productRepository.getById(productId);
 
         if (product == null) {
-            throw new NullPointerException("해당 상품이 존재하지 않습니다. productId = " + id);
+            throw new NullPointerException("해당 상품이 존재하지 않습니다. productId = " + productId);
         }
         return product;
+    }
+
+    public Product updateProduct(UserDetailsImpl nowUser, Long productId, ProductDto productDto) {
+        Product product = getProduct(productId);
+        product.updateProduct(productDto);
+        return product;
+
     }
 
     public List<Product> getProducts(Category category, String sort) {

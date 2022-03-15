@@ -51,7 +51,7 @@ public class OrderController {
 
     @Operation(description = "주문 취소, 로그인 필요", method = "DELETE")
     @DeleteMapping("/order/{orderId}")
-    public ResponseEntity<?> orderCancel(@AuthenticationPrincipal UserDetailsImpl nowUser, @PathVariable Long orderId) {
+    public ResponseEntity<?> cancelOrder(@AuthenticationPrincipal UserDetailsImpl nowUser, @PathVariable Long orderId) {
         try {
             orderService.orderCancel(nowUser, orderId);
             return new ResponseEntity<>(HttpStatus.OK);
@@ -100,6 +100,6 @@ public class OrderController {
     @Operation(description = "배송 도착, 로그인 필요", method = "GET")
     @GetMapping("/order/delivery")// 이곳은 택배 or 라이더에게 받는 요청으로 가정하고 결재가 완료된 order 의 주문상태를 변경한다.
     public void orderDeliveryArrived(@AuthenticationPrincipal UserDetailsImpl nowUser) {
-        orderService.deliveryArrive(nowUser);
+        orderService.orderDeliveryArrived(nowUser);
     }
 }
