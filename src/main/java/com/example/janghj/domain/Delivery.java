@@ -31,11 +31,18 @@ public class Delivery extends Timestamped {
 
     public Delivery(Order order, Address address) {
         this.order = order;
+        if (address == null) {
+            this.address = order.getUser().getAddress();
+        }
         this.address = address;
         this.status = DeliveryStatus.WaitingForPayment;
     }
 
     public void setStatus(DeliveryStatus status) {
         this.status = status;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
     }
 }

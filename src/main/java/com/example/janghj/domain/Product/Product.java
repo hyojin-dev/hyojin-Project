@@ -3,7 +3,6 @@ package com.example.janghj.domain.Product;
 import com.example.janghj.domain.Category;
 import com.example.janghj.domain.Order;
 import com.example.janghj.domain.Timestamped;
-import com.example.janghj.domain.User.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,14 +11,6 @@ import javax.persistence.*;
 
 import static javax.persistence.FetchType.LAZY;
 
-////@Inheritance(strategy = InheritanceType.JOINED)
-////@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-//@Entity
-//// 부모 테이블을 구분할 구분자 컬럼이름을 지어준다.
-//@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-//@DiscriminatorColumn(name = "PRODUCT")
-//@Getter @Setter
-//@Table
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

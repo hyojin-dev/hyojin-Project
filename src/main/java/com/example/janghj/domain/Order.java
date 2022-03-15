@@ -49,4 +49,8 @@ public class Order extends Timestamped {
     public void setDelivery(Delivery delivery) {
         this.delivery = delivery;
     }
+
+    public void setAddress(Address address) {
+        this.delivery.setAddress(address);
+    }
 }

@@ -35,16 +35,35 @@ public class OrderService {
 
         Order order = new Order(user);
 
-        List<OrderProduct> orderProducts = new ArrayList<>();
-        orderWebDto.getOrderList().forEach((productId, quantity) ->
-                orderProducts.add(createOrder(Long.parseLong((String) productId), (Integer) quantity, order)));
+        List<OrderProduct> orderProducts = getOrderProduct(order, orderWebDto);
         order.setOrderProduct(orderProducts);
 
-        Delivery delivery = new Delivery(order, user.getAddress());
+        Delivery delivery = new Delivery(order, orderWebDto.getAddress());
         order.setDelivery(delivery);
         orderRepository.save(order);
 
         return order;
+    }
+
+    @Transactional(readOnly = true, rollbackFor = Throwable.class)
+    public Order updateOrder(UserDetailsImpl nowUser, Long orderId, OrderWebDto orderWebDto) {
+        Order order = findByOrder(nowUser, orderId);
+        List<OrderProduct> orderProducts = getOrderProduct(order, orderWebDto);
+        order.setOrderProduct(orderProducts);
+
+        if (orderWebDto.getAddress() != null) {
+            order.setAddress(orderWebDto.getAddress());
+        }
+        orderRepository.save(order);
+
+        return order;
+    }
+
+    public List<OrderProduct> getOrderProduct(Order order, OrderWebDto orderWebDto) {
+        List<OrderProduct> orderProducts = new ArrayList<>();
+        orderWebDto.getOrderList().forEach((productId, quantity) ->
+                orderProducts.add(createOrder(Long.parseLong((String) productId), (Integer) quantity, order)));
+        return orderProducts;
     }
 
     @SneakyThrows // 예외 처리 기능
@@ -126,7 +145,5 @@ public class OrderService {
         );
 
         orderRepository.deleteById(orderId);
-
     }
-
 }

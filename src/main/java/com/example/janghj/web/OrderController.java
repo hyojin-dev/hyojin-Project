@@ -23,13 +23,24 @@ public class OrderController {
 //    401(권한 없음) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 //    402(결제 필요) return new ResponseEntity<>(HttpStatus.PAYMENT_REQUIRED);
 //    404(값이 없음) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//    406(사용자로부터 받는 값 부족) return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 //    416(처리할 수 없는 요청범위) return new ResponseEntity<>(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE);
 //    500(서버 오류) return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 
     @Operation(description = "주문 하기, 로그인 필요, 결재 필요", method = "POST")
     @PostMapping("/order")
-    public void order(@AuthenticationPrincipal UserDetailsImpl nowUser, @RequestBody OrderWebDto orderWebDto) {
+    public ResponseEntity<?> order(@AuthenticationPrincipal UserDetailsImpl nowUser, @RequestBody OrderWebDto orderWebDto) {
+        if (nowUser.getAddress() == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        }
         orderService.order(nowUser, orderWebDto);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(description = "주문 수정하기, 로그인 필요", method = "PUT")
+    @PutMapping("/order")
+    public void updateOrder(@AuthenticationPrincipal UserDetailsImpl nowUser, @PathVariable Long orderId, @RequestBody OrderWebDto orderWebDto) {
+        orderService.updateOrder(nowUser, orderId, orderWebDto);
     }
 
     @Operation(description = "나의 주문 1개 조회하기 , 로그인 필요", method = "GET")
@@ -81,13 +92,13 @@ public class OrderController {
     }
 
     @Operation(description = "배송 시작, 로그인 필요", method = "POST")
-    @PostMapping("/order/delivery")
+    @PostMapping("/order/delivery")// 이곳은 택배 or 라이더에게 받는 요청으로 가정하고 결재가 완료된 order 의 주문상태를 변경한다.
     public void orderDeliveryStart(@AuthenticationPrincipal UserDetailsImpl nowUser) {
         orderService.deliveryStart(nowUser);
     }
 
     @Operation(description = "배송 도착, 로그인 필요", method = "GET")
-    @GetMapping("/order/delivery")
+    @GetMapping("/order/delivery")// 이곳은 택배 or 라이더에게 받는 요청으로 가정하고 결재가 완료된 order 의 주문상태를 변경한다.
     public void orderDeliveryArrived(@AuthenticationPrincipal UserDetailsImpl nowUser) {
         orderService.deliveryArrive(nowUser);
     }
