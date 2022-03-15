@@ -69,7 +69,7 @@ public class OrderController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         } catch (NullPointerException e) { // 찾는 값이 없음
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Throwable e) { // 알 수 없는 에러(개발자가 예상하지 못한 에러는 생기지 않도록 한다.)
+        } catch (Throwable e) { // 알 수 없는 에러(개발자가 예상하지 못한 에러는 없어야한다.)
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
