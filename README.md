@@ -4,7 +4,6 @@ Jmeter를 이용하여 부하테스트를 진행해보았습니다.
 ![1111](https://user-images.githubusercontent.com/90826012/158863172-67ca1b20-ae7e-41e8-abd0-47ba63311d40.PNG)
 ![2222](https://user-images.githubusercontent.com/90826012/158863175-9e3158ac-d468-4892-bf53-770484fe964f.PNG)
 
-우선 기능 구현을 1순위로 하야 성능이 좋지 않을 것을 예상했지만 기대 이상으로 나오지 않았습니다.
 부하 테스트 결과를 분석해 보고 기존 로직보다 나은 로직을 고민하겠습니다.
 
 
