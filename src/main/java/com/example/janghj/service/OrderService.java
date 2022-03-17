@@ -14,6 +14,8 @@ import com.example.janghj.web.dto.OrderProduct;
 import com.example.janghj.web.dto.OrderWebDto;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -144,9 +146,12 @@ public class OrderService {
     }
 
     public void orderCancel(UserDetailsImpl nowUser, Long orderId) {
-        orderRepository.findById(orderId).orElseThrow(
+        Order order = orderRepository.findById(orderId).orElseThrow(
                 () -> new NullPointerException("해당 주문이 존재하지 않습니다. orderId = " + orderId)
         );
+        if (order.getUser().getId() != nowUser.getId()) {
+            throw new AccessDeniedException("유저(" + nowUser.getId() + ") 가 다른 유저(" + order.getUser().getId() + ")의 Order 에게 접근하려고 합니다.");
+        }
         orderRepository.deleteById(orderId);
     }
 
