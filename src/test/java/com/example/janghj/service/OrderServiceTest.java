@@ -120,5 +120,8 @@ class OrderServiceTest {
                 , order.getDelivery().getStatus(), DeliveryStatus.PaymentCompleted);
         assertEquals("상품을 구매한 User 보유 금액이 변경되어야 합니다. 20000->10000"
                 , userCash.getMoney(), 10000);
+        assertEquals("구매한 상품의 수량이 줄어들어야 합니다. 1000 -> 990"
+                , order.getOrderProduct().get(0).getProduct().getStockQuantity(), 990);
     }
+
 }
