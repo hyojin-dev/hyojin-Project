@@ -28,7 +28,7 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
 
-    @Transactional(readOnly = true, rollbackFor = Throwable.class)
+    @Transactional(rollbackFor = Throwable.class)
     public Order order(UserDetailsImpl nowUser, OrderWebDto orderWebDto) {
         User user = userRepository.findById(nowUser.getId()).orElseThrow(
                 () -> new NullPointerException("해당 유저가 존재하지 않습니다. id  = " + nowUser.getId()));
@@ -45,7 +45,23 @@ public class OrderService {
         return order;
     }
 
-    @Transactional(readOnly = true, rollbackFor = Throwable.class)
+    public List<OrderProduct> getOrderProduct(Order order, OrderWebDto orderWebDto) {
+        List<OrderProduct> orderProducts = new ArrayList<>();
+        orderWebDto.getOrderList().forEach((productId, quantity) ->
+                orderProducts.add(createOrder(Long.parseLong((String) productId), (Integer) quantity, order)));
+        return orderProducts;
+    }
+
+    @SneakyThrows
+    public OrderProduct createOrder(Long productId, int quantity, Order order) {
+        Product product = (Product) productRepository.findById(productId).orElseThrow(
+                () -> new NullPointerException("해당 상품이 없습니다. productId =" + productId));
+
+        int amount = product.getPrice() * quantity;
+        return new OrderProduct(product, product.getPrice(), order, quantity, amount);
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
     public Order updateOrder(UserDetailsImpl nowUser, Long orderId, OrderWebDto orderWebDto) {
         Order order = findByOrder(nowUser, orderId);
         List<OrderProduct> orderProducts = getOrderProduct(order, orderWebDto);
@@ -59,24 +75,21 @@ public class OrderService {
         return order;
     }
 
-    public List<OrderProduct> getOrderProduct(Order order, OrderWebDto orderWebDto) {
-        List<OrderProduct> orderProducts = new ArrayList<>();
-        orderWebDto.getOrderList().forEach((productId, quantity) ->
-                orderProducts.add(createOrder(Long.parseLong((String) productId), (Integer) quantity, order)));
-        return orderProducts;
+    public Order findByOrder(UserDetailsImpl nowUser, Long orderId) {
+        if (!nowUser.getUser().equals(nowUser.getUser())) {
+            throw new AccessDeniedException("유저(" + nowUser.getId() + ") 가 다른 유저(" + nowUser.getUser().getId() + ")에 접근하려고 합니다.");
+        }
+        Order order = orderRepository.findById(orderId).orElseThrow(
+                () -> new NullPointerException("해당 주문이 존재하지 않습니다. itemId = " + orderId)
+        );
+        return order;
     }
 
-    @SneakyThrows // 예외 처리 기능
-    @Transactional(readOnly = true, rollbackFor = Throwable.class)
-    public OrderProduct createOrder(Long productId, int quantity, Order order) {
-        Product product = (Product) productRepository.findById(productId).orElseThrow(
-                () -> new NullPointerException("해당 상품이 없습니다. productId =" + productId));
-
-        int amount = product.getPrice() * quantity;
-        return new OrderProduct(product, product.getPrice(), order, quantity, amount);
+    public List<Order> findByOrders(UserDetailsImpl nowUser) {
+        return orderRepository.findAllByUserId(nowUser.getId());
     }
 
-    @Transactional(readOnly = true, rollbackFor = Throwable.class)
+    @Transactional(rollbackFor = Throwable.class)
     public Order payForTheOrder(UserDetailsImpl nowUser, Long orderId) throws Exception {
         Order order = findByOrder(nowUser, orderId);
         User user = nowUser.getUser();
@@ -85,65 +98,63 @@ public class OrderService {
 
         user.payForIt(order.getTotalAmount());
 
+        List<OrderProduct> orderProducts = order.getOrderProduct();
+
+        orderProducts.forEach((orderProduct) ->
+                salesQuantity(orderProduct));
+
         order.getDelivery().setStatus(DeliveryStatus.PaymentCompleted);
+        orderRepository.save(order);
         return order;
     }
 
-    @Transactional(readOnly = true, rollbackFor = Throwable.class)
-    public void payForTheOrders(UserDetailsImpl nowUser) {
-        int totalAmount = 0;
-        List<Order> orders = findByOrders(nowUser);
-        User user = nowUser.getUser();
+    private void salesQuantity(OrderProduct orderProduct) {
+        orderProduct.salesQuantity();
+    }
 
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void payForTheOrders(UserDetailsImpl nowUser) {
+        List<Order> getOrders = findByDeliveryStatusOrders(nowUser, DeliveryStatus.WaitingForPayment);
+        User user = nowUser.getUser();
+        int totalAmount = setOrder(user, getOrders);
+
+        user.payForIt(totalAmount);
+    }
+
+    public List<Order> findByDeliveryStatusOrders(UserDetailsImpl nowUser, DeliveryStatus deliveryStatus) {
+        return orderRepository.findAllByUserIdAndDelivery_Status(nowUser.getId(), deliveryStatus);
+    }
+
+    public int setOrder(User user, List<Order> orders) {
+        int totalAmount = 0;
         for (Order order : orders) {
             totalAmount += order.getTotalAmount();
             order.getDelivery().setStatus(DeliveryStatus.PaymentCompleted);
             canIBuyThis(user.getUserCash(), order);
         }
-        user.payForIt(totalAmount);
+        return totalAmount;
     }
 
     public Boolean canIBuyThis(UserCash userCash, Order order) {
         if (userCash.getMoney() < order.getTotalAmount()) {
-            throw new ArithmeticException();
+            throw new ArithmeticException("보유한 금액(" + userCash.getMoney() + ")보다 상품의 가격(" + order.getTotalAmount() + ")이 높습니다.");
         }
         return true;
     }
 
-
-    @Transactional(readOnly = true, rollbackFor = Throwable.class)
-    public void deliveryStart(UserDetailsImpl nowUser) {
-
-    }
-
-    @Transactional(readOnly = true, rollbackFor = Throwable.class)
-    public void orderDeliveryArrived(UserDetailsImpl nowUser) {
-
-    }
-
-    @Transactional(readOnly = true, rollbackFor = Throwable.class)
-    public Order findByOrder(UserDetailsImpl nowUser, Long orderId) {
-        if (!nowUser.getUser().equals(nowUser.getUser())) {
-            throw new AccessDeniedException("유저(" + nowUser.getId() + ") 가 다른 유저(" + nowUser.getUser().getId() + ")에 접근하려고 합니다.");
-        }
-
-        Order order = orderRepository.findById(orderId).orElseThrow(
-                () -> new NullPointerException("해당 주문이 존재하지 않습니다. itemId = " + orderId)
-        );
-
-        return order;
-    }
-
-    public List<Order> findByOrders(UserDetailsImpl nowUser) {
-        return orderRepository.findAllByUserId(nowUser.getId());
-    }
-
-    @Transactional(readOnly = true, rollbackFor = Throwable.class)
     public void orderCancel(UserDetailsImpl nowUser, Long orderId) {
         orderRepository.findById(orderId).orElseThrow(
                 () -> new NullPointerException("해당 주문이 존재하지 않습니다. orderId = " + orderId)
         );
-
         orderRepository.deleteById(orderId);
+    }
+
+    @Transactional(readOnly = true, rollbackFor = Throwable.class)
+    public void deliveryStart(UserDetailsImpl nowUser) {
+    }
+
+    @Transactional(readOnly = true, rollbackFor = Throwable.class)
+    public void orderDeliveryArrived(UserDetailsImpl nowUser) {
     }
 }
