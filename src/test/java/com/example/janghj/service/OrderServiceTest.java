@@ -61,7 +61,6 @@ class OrderServiceTest {
         User user = userService.registerUser(userDto);
         this.userDetails = new UserDetailsImpl(user);
 
-//        ProductDto productDto = new ProductDto("TestProduct", 1000, 1000, Category.TOP, ProductColor.RED, 130);
         ProductDto productDto = new ProductDto(null, "TestProduct", 1000, 1000, Category.TOP, ProductColor.RED, 130,1,2);
         productService.registerProduct(productDto);
 
@@ -123,5 +122,4 @@ class OrderServiceTest {
         assertEquals("구매한 상품의 수량이 줄어들어야 합니다. 1000 -> 990"
                 , order.getOrderProduct().get(0).getProduct().getStockQuantity(), 990);
     }
-
 }
