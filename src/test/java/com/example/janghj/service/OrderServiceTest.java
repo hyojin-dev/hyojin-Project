@@ -13,6 +13,7 @@ import com.example.janghj.repository.OrderRepository;
 import com.example.janghj.repository.ProductRepository;
 import com.example.janghj.repository.UserCashRepository;
 import com.example.janghj.repository.UserRepository;
+import com.example.janghj.web.dto.AddressDto;
 import com.example.janghj.web.dto.OrderWebDto;
 import com.example.janghj.web.dto.ProductDto;
 import com.example.janghj.web.dto.UserDto;
@@ -56,20 +57,22 @@ class OrderServiceTest {
     void beforeEach() {
         UserDto userDto = new UserDto(
                 "test1234", "password", "email",
-                new Address("city", "street", "zipcode")
-                , false, "");
+                new AddressDto("city", "street", "zipcode"),
+                false, "");
         User user = userService.registerUser(userDto);
         this.userDetails = new UserDetailsImpl(user);
 
-        ProductDto productDto = new ProductDto(null, "TestProduct", 1000, 1000, Category.TOP, ProductColor.RED, 130,1,2);
+        ProductDto productDto = new ProductDto("TestProduct", 1000, 1000, Category.TOP, ProductColor.RED, 130);
         productService.registerProduct(productDto);
 
         Product product = productRepository.findByName("TestProduct");
 
+        String productId = product.getId().toString();
+        Integer quantity = 10;
+
         Map orderList = new ConcurrentHashMap<String, Integer>();
-        String object = product.getId().toString();
-        Integer object2 = 10;
-        orderList.put(object, object2);
+        orderList.put(productId, quantity);
+
         this.orderWebDto = new OrderWebDto(orderList, new Address("city", "street", "zipcode"));
     }
 
@@ -101,11 +104,11 @@ class OrderServiceTest {
         orderservice.orderCancel(userDetails, order.getId());
 
         // then
-        assertEquals("저장된 OrderRepository 의 크기가 0과 같아야 합니다.", orderRepository.findAll().size(), 0);
+        assertEquals("저장된 주문이 삭제되어 orderRepository 의 크기가 0 이 되어야 합니다.", orderRepository.findAll().size(), 0);
     }
 
     @Test
-    @DisplayName("주문 1개 결재 성공")
+    @DisplayName("10개 상품 주문 및 결재 성공")
     void payForTheOrder() throws Exception {
         // given
         UserCash userCash = userService.depositUserCash(userDetails.getUser(), 20000);
@@ -117,7 +120,7 @@ class OrderServiceTest {
         // then
         assertEquals("Order 주문 상태가 PaymentCompleted 로 변경되어야 합니다."
                 , order.getDelivery().getStatus(), DeliveryStatus.PaymentCompleted);
-        assertEquals("상품을 구매한 User 보유 금액이 변경되어야 합니다. 20000->10000"
+        assertEquals("상품을 구매한 User 보유 금액이 변경되어야 합니다. (사용자가 보유한 금액 - 구매한 상품 가격)"
                 , userCash.getMoney(), 10000);
         assertEquals("구매한 상품의 수량이 줄어들어야 합니다. 1000 -> 990"
                 , order.getOrderProduct().get(0).getProduct().getStockQuantity(), 990);
