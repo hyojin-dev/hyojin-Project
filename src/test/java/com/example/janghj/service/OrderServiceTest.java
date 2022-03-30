@@ -108,7 +108,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("10개 상품 주문 및 결재 성공")
+    @DisplayName("1개 상품 주문 및 결재 성공")
     void payForTheOrder() throws Exception {
         // given
         UserCash userCash = userService.depositUserCash(userDetails.getUser(), 20000);
