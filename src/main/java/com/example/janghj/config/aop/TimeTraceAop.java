@@ -12,25 +12,26 @@ import org.springframework.util.StopWatch;
 @Log4j2
 public class TimeTraceAop {
 
-    // 모든 패키지 중 web package 내부에 존재하는 클래스를 적용
+    // AOP 적용 위치(web package 내부 클래스)
     @Around("execution(* *..web.*.*(..))")
     public Object calculateExecutionTime(ProceedingJoinPoint pjp) throws Throwable {
-        // 해당 클래스 처리 전의 시간
         StopWatch sw = new StopWatch();
+        // 측정 시작
         sw.start();
 
-        // 해당 클래스의 메소드 실행
+        // AOP 적용 메소드 실행
         Object result = pjp.proceed();
 
-        // 해당 클래스 처리 후의 시간
+        // 측정 종료
         sw.stop();
         long executionTime = sw.getTotalTimeMillis();
 
+        // AOP가 적용된 메소드 위치 출력용
         String className = pjp.getTarget().getClass().getName();
         String methodName = pjp.getSignature().getName();
         String task = className + "." + methodName;
 
-        log.debug("[ExecutionTime] " + task + "-->" + executionTime + "(ms)");
+        log.debug("[TimeTraceAop] " + task + "-->" + executionTime + "(ms)");
         return result;
     }
 }
