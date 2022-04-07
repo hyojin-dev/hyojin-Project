@@ -13,6 +13,8 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.persistence.FetchType.LAZY;
+
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
@@ -43,11 +45,12 @@ public class User extends Timestamped {
     @Embedded
     private Address address;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Order> order = new ArrayList<>();
 
     @JsonIgnore
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToOne(fetch = LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_cash_id")
     private UserCash userCash;
 
     @JsonIgnore
@@ -58,13 +61,12 @@ public class User extends Timestamped {
     private List<UserLikes> userLike;
 
     @Builder
-    public User(String username, String password, String email, Address address) {
+    public User(String username, String password, String email, Address address, UserRole userRole) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.address = address;
-        this.role = UserRole.USER;
-        ;
+        this.role = userRole;
     }
 
     public User(String username, String password, String email) {
@@ -86,8 +88,8 @@ public class User extends Timestamped {
         this.address = address;
     }
 
-    public void setProfileImgUrl(String profileImgUrl) {
-        this.profileImgUrl = profileImgUrl;
+    public void setUserCash(UserCash userCash) {
+        this.userCash = userCash;
     }
 
     public void payForIt(int amount) {
