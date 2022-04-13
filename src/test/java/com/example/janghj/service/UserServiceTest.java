@@ -42,7 +42,6 @@ public class UserServiceTest {
         // given
 
         // when
-        System.out.println("일단 실행됨");
         User user = userService.registerUser(userDto);
 
         // then
