@@ -40,8 +40,6 @@ public class User extends Timestamped {
     @Enumerated(value = EnumType.STRING)
     private UserRole role;
 
-    private String profileImgUrl;
-
     @Embedded
     private Address address;
 
@@ -53,20 +51,14 @@ public class User extends Timestamped {
     @JoinColumn(name = "user_cash_id")
     private UserCash userCash;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<UserCoupon> userCoupon = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    private List<UserLikes> userLike;
-
     @Builder
-    public User(String username, String password, String email, Address address, UserRole userRole) {
+    public User(String username, String password, String email, UserRole role, Address address, UserCash userCash) {
         this.username = username;
         this.password = password;
         this.email = email;
+        this.role = role;
         this.address = address;
-        this.role = userRole;
+        this.userCash = userCash;
     }
 
     public User(String username, String password, String email) {
