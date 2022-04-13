@@ -36,25 +36,22 @@ public class UserService {
     @Transactional(rollbackFor = Throwable.class)
     public User registerUser(UserDto userDto) {
         UserRole userRole = UserRole.USER;
-
         if (userDto.isAdmin()) {
             if (userDto.getAdminToken().equals(ADMIN_TOKEN)) {
                 userRole = UserRole.ADMIN;
             }
         }
-
+//        String username, String password, String email, UserRole role, Address address, UserCash userCash
         User user = User.builder()
                 .username(userDto.getUsername())
                 .password(passwordEncoder.encode(userDto.getPassword()))
                 .email(userDto.getEmail())
+                .role(userRole)
                 .address(new Address(userDto.getAddressDto()))
-                .userRole(userRole)
+                .userCash(new UserCash())
                 .build();
-
-        UserCash userCash = new UserCash(user);
-        user.setUserCash(userCash);
-
         userRepository.save(user);
+
         return user;
     }
 
@@ -75,9 +72,6 @@ public class UserService {
                 () -> new NullPointerException("해당 사용자가 없습니다. userName = " + userDto.getUsername())
         );
         if (passwordEncoder.matches(userDto.getPassword(), user.getPassword())) {
-            if (userDto.getPassword() == user.getPassword()) {
-
-            }
             return true;
         }
         return false;
