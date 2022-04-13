@@ -42,12 +42,15 @@ public class UserServiceTest {
         // given
 
         // when
+        System.out.println("일단 실행됨");
         User user = userService.registerUser(userDto);
 
         // then
         Optional<User> findByOrder = userRepository.findByUsername(user.getUsername());
         assertEquals("유저의 ID 값이 저장되어야 한다.",
                 user.getId(), findByOrder.get().getId());
+        assertEquals("유저의 ID 값이 저장되어야 한다.",
+                user.getUserCash().getId(), findByOrder.get().getUserCash().getId());
     }
 
     @Test
