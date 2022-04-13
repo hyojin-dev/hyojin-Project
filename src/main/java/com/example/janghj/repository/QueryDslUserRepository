@@ -1,6 +1,10 @@
 package com.example.janghj.repository;
 
 import com.example.janghj.domain.User.User;
+import com.example.janghj.repository.dto.QUserOrderDto;
+import com.example.janghj.repository.dto.UserOrderDto;
+import com.example.janghj.repository.dto.UserOrderSearchDto;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -8,6 +12,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static com.example.janghj.domain.User.QUser.user;
+import static com.example.janghj.domain.QOrder.order;
+import static org.springframework.util.StringUtils.hasText;
 
 @Repository
 @RequiredArgsConstructor
@@ -15,15 +21,45 @@ public class QueryDslUserRepository {  // QueryDsl Practice class
 
     private final JPAQueryFactory queryFactory;
 
-    public List<User> findByUsername_Querydsl(String username) {
+    public List<User> findByUsernameQuerydsl(String username) {
         return queryFactory
                 .selectFrom(user)
                 .where(user.username.eq(username))
                 .fetch();
     }
 
-    public List<User> findAll_Querydsl() {
+    public List<User> findAllQuerydsl() {
         return queryFactory
                 .selectFrom(user).fetch();
     }
+
+    public UserOrderDto userOrderSearch(UserOrderSearchDto userOrderSearchDto) {
+        return queryFactory
+                .select(new QUserOrderDto(
+                        user.id,
+                        user.kakaoId,
+                        user.username,
+                        user.email,
+                        user.role,
+                        user.address,
+                        order.id,
+                        order.totalAmount,
+                        order.orderProduct,
+                        order.orderStatus
+                ))
+                .from(user)
+                .join(user.order, order)
+                .where(userIdEq(userOrderSearchDto.getUserId()),
+                        orderIdEq(userOrderSearchDto.getOrderId()))
+                .fetchOne();
+    }
+
+    private BooleanExpression userIdEq(Long userId) {
+        return userId != null ? user.id.eq(Long.valueOf(userId)) : null;
+    }
+
+    private BooleanExpression orderIdEq(Long orderId) {
+        return orderId != null ? user.id.eq(Long.valueOf(orderId)) : null;
+    }
+
 }
