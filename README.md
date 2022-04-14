@@ -19,5 +19,5 @@ Jmeter를 이용하여 부하테스트를 진행해보았습니다.
 ![1111](https://user-images.githubusercontent.com/90826012/158407519-61dedf98-3d39-4a84-b65b-837e8e4f8daa.PNG)
 ![2222](https://user-images.githubusercontent.com/90826012/158407527-faf48ddf-f85b-4e80-9bd2-93ae03b02180.PNG)
 
-로직, RestFul, AOP 적용, 코드 리팩토링은 전체적인 기능 완성 이후 진행 예정입니다.
+API 입니다.
 
