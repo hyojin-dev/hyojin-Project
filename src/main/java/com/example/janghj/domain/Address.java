@@ -1,6 +1,7 @@
 package com.example.janghj.domain;
 
 
+import com.example.janghj.web.dto.AddressDto;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,5 +20,11 @@ public class Address {
         this.city = city;
         this.street = street;
         this.zipcode = zipcode;
+    }
+
+    public Address(AddressDto addressDto) {
+        this.city = addressDto.getCity();
+        this.street = addressDto.getStreet();
+        this.zipcode = addressDto.getZipcode();
     }
 }

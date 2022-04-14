@@ -2,8 +2,8 @@ package com.example.janghj.service;
 
 import com.example.janghj.config.security.UserDetailsImpl;
 import com.example.janghj.domain.Delivery;
-import com.example.janghj.domain.DeliveryStatus;
 import com.example.janghj.domain.Order;
+import com.example.janghj.domain.OrderStatus;
 import com.example.janghj.domain.Product.Product;
 import com.example.janghj.domain.User.User;
 import com.example.janghj.domain.User.UserCash;
@@ -14,8 +14,6 @@ import com.example.janghj.web.dto.OrderProduct;
 import com.example.janghj.web.dto.OrderWebDto;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +40,7 @@ public class OrderService {
 
         Delivery delivery = new Delivery(order, orderWebDto.getAddress());
         order.setDelivery(delivery);
+
         orderRepository.save(order);
 
         return order;
@@ -50,14 +49,15 @@ public class OrderService {
     public List<OrderProduct> getOrderProduct(Order order, OrderWebDto orderWebDto) {
         List<OrderProduct> orderProducts = new ArrayList<>();
         orderWebDto.getOrderList().forEach((productId, quantity) ->
-                orderProducts.add(createOrder(Long.parseLong((String) productId), (Integer) quantity, order)));
+                orderProducts.add(createOrderProduct(Long.parseLong((String) productId), (Integer) quantity, order)));
         return orderProducts;
     }
 
     @SneakyThrows
-    public OrderProduct createOrder(Long productId, int quantity, Order order) {
+    public OrderProduct createOrderProduct(Long productId, int quantity, Order order) {
         Product product = (Product) productRepository.findById(productId).orElseThrow(
                 () -> new NullPointerException("해당 상품이 없습니다. productId =" + productId));
+        product.salesQuantity(quantity);
 
         int amount = product.getPrice() * quantity;
         return new OrderProduct(product, product.getPrice(), order, quantity, amount);
@@ -100,39 +100,29 @@ public class OrderService {
 
         user.payForIt(order.getTotalAmount());
 
-        List<OrderProduct> orderProducts = order.getOrderProduct();
-
-        orderProducts.forEach((orderProduct) ->
-                salesQuantity(orderProduct));
-
-        order.getDelivery().setStatus(DeliveryStatus.PaymentCompleted);
+        order.setPaymentCompleted();
         orderRepository.save(order);
         return order;
     }
 
-    private void salesQuantity(OrderProduct orderProduct) {
-        orderProduct.salesQuantity();
-    }
-
-
     @Transactional(rollbackFor = Throwable.class)
     public void payForTheOrders(UserDetailsImpl nowUser) {
-        List<Order> getOrders = findByDeliveryStatusOrders(nowUser, DeliveryStatus.WaitingForPayment);
+        List<Order> getOrders = findByDeliveryStatusOrders(nowUser, OrderStatus.WaitingForPayment);
         User user = nowUser.getUser();
         int totalAmount = setOrder(user, getOrders);
 
         user.payForIt(totalAmount);
     }
 
-    public List<Order> findByDeliveryStatusOrders(UserDetailsImpl nowUser, DeliveryStatus deliveryStatus) {
-        return orderRepository.findAllByUserIdAndDelivery_Status(nowUser.getId(), deliveryStatus);
+    public List<Order> findByDeliveryStatusOrders(UserDetailsImpl nowUser, OrderStatus orderStatus) {
+        return orderRepository.findAllByUserIdAndOrderStatus(nowUser.getId(), orderStatus);
     }
 
     public int setOrder(User user, List<Order> orders) {
         int totalAmount = 0;
         for (Order order : orders) {
             totalAmount += order.getTotalAmount();
-            order.getDelivery().setStatus(DeliveryStatus.PaymentCompleted);
+            order.getDelivery().setStatus();
             canIBuyThis(user.getUserCash(), order);
         }
         return totalAmount;

@@ -24,7 +24,7 @@ public class Order extends Timestamped {
 
     private int totalAmount;
 
-    @ManyToOne(fetch = LAZY)
+    @ManyToOne(fetch = LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -35,14 +35,26 @@ public class Order extends Timestamped {
     @JoinColumn(name = "delivery_id")
     private Delivery delivery;
 
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus; // WaitingForPayment, PaymentCompleted,
+
+    public Order(int totalAmount, User user, List<OrderProduct> orderProduct, Delivery delivery, OrderStatus orderStatus) {
+        this.totalAmount = totalAmount;
+        this.user = user;
+        this.orderProduct = orderProduct;
+        this.delivery = delivery;
+        this.orderStatus = orderStatus;
+    }
+
     public Order(User user) {
         this.user = user;
+        this.orderStatus = OrderStatus.WaitingForPayment;
     }
 
     public void setOrderProduct(List<OrderProduct> orderProduct) {
         this.orderProduct = orderProduct;
-        for (OrderProduct amount : orderProduct) {
-            this.totalAmount += amount.getAmount();
+        for (OrderProduct orderPrice : orderProduct) {
+            this.totalAmount += orderPrice.getAmount();
         }
     }
 
@@ -52,5 +64,9 @@ public class Order extends Timestamped {
 
     public void setAddress(Address address) {
         this.delivery.setAddress(address);
+    }
+
+    public void setPaymentCompleted() {
+        this.orderStatus = OrderStatus.PaymentCompleted;
     }
 }

@@ -20,13 +20,6 @@ public class OrderController {
 
     private final OrderService orderService;
 
-//    401(권한 없음) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-//    402(결제 필요) return new ResponseEntity<>(HttpStatus.PAYMENT_REQUIRED);
-//    404(값이 없음) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//    406(사용자로부터 받는 값 부족) return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
-//    416(처리할 수 없는 요청범위) return new ResponseEntity<>(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE);
-//    500(서버 오류) return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-
     @Operation(description = "주문 하기, 로그인 필요, 결재 필요", method = "POST")
     @PostMapping("/order")
     public ResponseEntity<?> order(@AuthenticationPrincipal UserDetailsImpl nowUser, @RequestBody OrderWebDto orderWebDto) {
@@ -56,7 +49,7 @@ public class OrderController {
             orderService.orderCancel(nowUser, orderId);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (AccessDeniedException e) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            throw new AccessDeniedException("해당 주문에 접근할 권한이 없습니다.");
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -77,7 +70,7 @@ public class OrderController {
         } catch (ArithmeticException e) { // 결재 금액 부족
             return new ResponseEntity<>(HttpStatus.PAYMENT_REQUIRED);
         } catch (AccessDeniedException e) { // 권한 없음
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            throw new AccessDeniedException("해당 주문에 접근할 권한이 없습니다.");
         } catch (NullPointerException e) { // 찾는 값이 없음
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Throwable e) { // 알 수 없는 에러(개발자가 예상하지 못한 에러는 없어야한다.)

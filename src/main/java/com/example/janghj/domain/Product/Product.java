@@ -1,7 +1,6 @@
 package com.example.janghj.domain.Product;
 
 import com.example.janghj.domain.Category;
-import com.example.janghj.domain.Order;
 import com.example.janghj.domain.Timestamped;
 import com.example.janghj.web.dto.ProductDto;
 import lombok.AccessLevel;
@@ -9,8 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-
-import static javax.persistence.FetchType.LAZY;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -38,10 +35,6 @@ public abstract class Product extends Timestamped {
     @Enumerated(value = EnumType.STRING)
     private ProductColor productColor;
 
-    @JoinColumn(name = "order_id")
-    @ManyToOne(fetch = LAZY)
-    private Order order;
-
     public Product(String name, int price, int stockQuantity, Category category, ProductColor productColor) {
         this.name = name;
         this.price = price;
@@ -56,5 +49,12 @@ public abstract class Product extends Timestamped {
         this.stockQuantity = productDto.getStockQuantity();
         this.category = productDto.getCategory();
         this.productColor = productDto.getProductColor();
+    }
+
+    public void salesQuantity(int salesQuantity) {
+        this.stockQuantity -= salesQuantity;
+        if (salesQuantity <= 0) {
+            throw new ArithmeticException();
+        }
     }
 }

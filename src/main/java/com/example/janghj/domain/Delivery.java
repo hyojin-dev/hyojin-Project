@@ -27,7 +27,7 @@ public class Delivery extends Timestamped {
     private Address address;
 
     @Enumerated(EnumType.STRING)
-    private DeliveryStatus status; //WaitingForPayment, PaymentCompleted, Start, Arrived
+    private DeliveryStatus status; // READY, Start, Arrived
 
     public Delivery(Order order, Address address) {
         this.order = order;
@@ -35,11 +35,11 @@ public class Delivery extends Timestamped {
             this.address = order.getUser().getAddress();
         }
         this.address = address;
-        this.status = DeliveryStatus.WaitingForPayment;
+        this.status = DeliveryStatus.READY;
     }
 
-    public void setStatus(DeliveryStatus status) {
-        this.status = status;
+    public void setStatus() {
+        this.status = DeliveryStatus.READY;
     }
 
     public void setAddress(Address address) {

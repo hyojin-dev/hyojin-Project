@@ -6,13 +6,21 @@ import lombok.Getter;
 
 @Getter
 public class ProductDto {
-    String name;
-    int price;
-    int stockQuantity;
+    String name = "";
+    int price = 0;
+    int stockQuantity = 0;
     Category category; // TOP, PANTS, OUTER, SHOES, BAG
     ProductColor productColor; // RED, ORANGE, YELLOW, GREEN, BLUE, NAVY, PURPLE
 
-    int topSize;
-    int pantsSize;
-    int shoesSize;
+    int size = 0;
+
+    // Test 용도
+    public ProductDto(String name, int price, int stockQuantity, Category category, ProductColor productColor, int size) {
+        this.name = name;
+        this.price = price;
+        this.stockQuantity = stockQuantity;
+        this.category = category;
+        this.productColor = productColor;
+        this.size = size;
+    }
 }

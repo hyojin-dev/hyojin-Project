@@ -41,7 +41,7 @@ public class UserService {
                 userRole = UserRole.ADMIN;
             }
         }
-//        String username, String password, String email, UserRole role, Address address, UserCash userCash
+
         User user = User.builder()
                 .username(userDto.getUsername())
                 .password(passwordEncoder.encode(userDto.getPassword()))

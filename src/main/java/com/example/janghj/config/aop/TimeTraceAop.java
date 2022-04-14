@@ -31,6 +31,7 @@ public class TimeTraceAop {
         String methodName = pjp.getSignature().getName();
         String task = className + "." + methodName;
 
+        System.out.println("[TimeTraceAop] " + task + "-->" + executionTime + "(ms)");
         log.debug("[TimeTraceAop] " + task + "-->" + executionTime + "(ms)");
         return result;
     }

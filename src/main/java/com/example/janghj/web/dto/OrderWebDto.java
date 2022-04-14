@@ -10,4 +10,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class OrderWebDto {
     Map orderList = new ConcurrentHashMap<String, Integer>();
     Address address;
+
+    public OrderWebDto(Map orderList, Address address) {
+        this.orderList = orderList;
+        this.address = address;
+    }
 }

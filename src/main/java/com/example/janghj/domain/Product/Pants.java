@@ -18,6 +18,6 @@ public class Pants extends Product {
 
     public Pants(ProductDto productDto) {
         super(productDto.getName(), productDto.getPrice(), productDto.getStockQuantity(), productDto.getCategory(), productDto.getProductColor());
-        this.pantsSize = productDto.getPantsSize();
+        this.pantsSize = productDto.getSize();
     }
 }

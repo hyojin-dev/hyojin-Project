@@ -19,6 +19,6 @@ public class Shoes extends Product {
 
     public Shoes(ProductDto productDto) {
         super(productDto.getName(), productDto.getPrice(), productDto.getStockQuantity(), productDto.getCategory(), productDto.getProductColor());
-        this.shoesSize = productDto.getShoesSize();
+        this.shoesSize = productDto.getSize();
     }
 }

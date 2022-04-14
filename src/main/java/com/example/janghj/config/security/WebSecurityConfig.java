@@ -48,8 +48,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 //                인증 과정 필요함
 //                .antMatchers(HttpMethod.GET, "/..").authenticated()
-
-                .antMatchers(HttpMethod.PUT, "/reviedfdfws/**").authenticated()
+                .antMatchers(HttpMethod.PUT, "/securityTest/**").authenticated()
 
                 // 그 외 모든 요청은 인증과정 필요
                 // .anyRequest().authenticated()
@@ -100,7 +99,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public MappingJackson2HttpMessageConverter jsonEscapeConverter() {
         // MappingJackson2HttpMessageConverter Default ObjectMapper 설정 및 ObjectMapper Config 설정
         ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
-        objectMapper.getFactory().setCharacterEscapes(new HtmlCharacterEscapes());
+        objectMapper.getFactory().setCharacterEscapes(new HtmlCharacterEscapes()); // SQL injection 방지
         return new MappingJackson2HttpMessageConverter(objectMapper);
     }
 }
