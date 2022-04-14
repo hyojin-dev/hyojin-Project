@@ -1,8 +1,10 @@
 # 상품 판매 웹 서버 토이프로젝트입니다.
 
-QueryDsl Test 및 적용 중입니다.
+QueryDsl join Test 및 로직 적용 중입니다.
 
 Controller 실행 시간을 측정하는 AOP 적용하였습니다.
+![AOP test](https://user-images.githubusercontent.com/90826012/163409662-490724ab-d85c-473f-9877-0a299660038c.PNG)
+
 
 Jmeter를 이용하여 부하테스트를 진행해보았습니다.
 ![1111](https://user-images.githubusercontent.com/90826012/158863172-67ca1b20-ae7e-41e8-abd0-47ba63311d40.PNG)
