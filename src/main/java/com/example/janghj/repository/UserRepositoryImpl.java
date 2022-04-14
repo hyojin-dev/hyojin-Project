@@ -20,16 +20,8 @@ public class UserRepositoryImpl {
     public UserOrderDto userOrderSearch(UserOrderSearchDto userOrderSearchDto) {
         return queryFactory
                 .select(new QUserOrderDto(
-                        user.id,
-                        user.kakaoId,
-                        user.username,
-                        user.email,
-                        user.role,
-                        user.address,
-                        order.id,
-                        order.totalAmount,
-                        order.orderProduct,
-                        order.orderStatus
+                        user,
+                        order
                 ))
                 .from(user)
                 .join(user.order, order)

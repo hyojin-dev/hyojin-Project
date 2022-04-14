@@ -6,4 +6,9 @@ import lombok.Getter;
 public class UserOrderSearchDto {
     private Long userId;
     private Long orderId;
+
+    public UserOrderSearchDto(Long userId, Long orderId) {
+        this.userId = userId;
+        this.orderId = orderId;
+    }
 }
