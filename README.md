@@ -3,7 +3,7 @@
 ![QueryDsl](https://user-images.githubusercontent.com/90826012/163416354-e9cdf629-81f0-4fde-afa4-1245784bec8f.PNG)
 
 2022.04.14
-QueryDsl join Test 및 로직 적용 중입니다.
+QueryDsl 동적 쿼리 작성 및 적용 중입니다.
 
 ![AOP test](https://user-images.githubusercontent.com/90826012/163409662-490724ab-d85c-473f-9877-0a299660038c.PNG)
 
