@@ -2,6 +2,7 @@
 
 2022.04.14
 QueryDsl join Test 및 로직 적용 중입니다.
+![QueryDsl](https://user-images.githubusercontent.com/90826012/163416189-eb9baf10-d9a6-4807-8831-420b413573ce.PNG)
 
 Controller 실행 시간을 측정하는 AOP 적용하였습니다.
 ![AOP test](https://user-images.githubusercontent.com/90826012/163409662-490724ab-d85c-473f-9877-0a299660038c.PNG)
