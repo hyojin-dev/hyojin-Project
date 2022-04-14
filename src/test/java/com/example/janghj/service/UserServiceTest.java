@@ -45,11 +45,13 @@ public class UserServiceTest {
         User user = userService.registerUser(userDto);
 
         // then
-        Optional<User> findByOrder = userRepository.findByUsername(user.getUsername());
+        User findByUser = userRepository.findByUsername(user.getUsername()).orElseThrow(
+                () -> new NullPointerException("UserServiceTest - 저장된 유저를 찾을 수 없습니다."));
+
         assertEquals("유저의 ID 값이 저장되어야 한다.",
-                user.getId(), findByOrder.get().getId());
+                user.getId(), findByUser.getId());
         assertEquals("유저의 ID 값이 저장되어야 한다.",
-                user.getUserCash().getId(), findByOrder.get().getUserCash().getId());
+                user.getUserCash().getId(), findByUser.getUserCash().getId());
     }
 
     @Test

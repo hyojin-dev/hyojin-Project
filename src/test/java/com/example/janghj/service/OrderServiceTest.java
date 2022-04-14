@@ -3,8 +3,8 @@ package com.example.janghj.service;
 import com.example.janghj.config.security.UserDetailsImpl;
 import com.example.janghj.domain.Address;
 import com.example.janghj.domain.Category;
-import com.example.janghj.domain.DeliveryStatus;
 import com.example.janghj.domain.Order;
+import com.example.janghj.domain.OrderStatus;
 import com.example.janghj.domain.Product.Product;
 import com.example.janghj.domain.Product.ProductColor;
 import com.example.janghj.domain.User.User;
@@ -52,6 +52,7 @@ class OrderServiceTest {
 
     UserDetailsImpl userDetails;
     OrderWebDto orderWebDto;
+    UserCash userCash;
 
     @BeforeEach
     void beforeEach() {
@@ -62,15 +63,16 @@ class OrderServiceTest {
         User user = userService.registerUser(userDto);
         this.userDetails = new UserDetailsImpl(user);
 
+        this.userCash = userService.depositUserCash(userDetails.getUser(), 20000);
+
         ProductDto productDto = new ProductDto("TestProduct", 1000, 1000, Category.TOP, ProductColor.RED, 130);
         productService.registerProduct(productDto);
 
         Product product = productRepository.findByName("TestProduct");
 
+        Map orderList = new ConcurrentHashMap<String, Integer>();
         String productId = product.getId().toString();
         Integer quantity = 10;
-
-        Map orderList = new ConcurrentHashMap<String, Integer>();
         orderList.put(productId, quantity);
 
         this.orderWebDto = new OrderWebDto(orderList, new Address("city", "street", "zipcode"));
@@ -80,12 +82,14 @@ class OrderServiceTest {
     @DisplayName("주문하기 성공")
     void order() throws Exception {
         // given
-        Order order = orderservice.order(userDetails, orderWebDto);
 
         // when
-        Order findByOrder = orderservice.findByOrder(userDetails, order.getId());
+        Order order = orderservice.order(userDetails, orderWebDto);
 
         // then
+        Order findByOrder = orderservice.findByOrder(userDetails, order.getId());
+        assertEquals("주문 수량이 1이어야 합니다.",
+                order.getId(), findByOrder.getId());
         assertEquals("생성된 orderId 값과 찾아낸 orderId 값이 일치해야 합니다.",
                 order.getId(), findByOrder.getId());
         assertEquals("생성된 order 상품들과 찾아낸 order 상품들의 값이 일치해야 합니다.",
@@ -108,10 +112,9 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("1개 상품 주문 및 결재 성공")
+    @DisplayName("1개 상품 결재 성공")
     void payForTheOrder() throws Exception {
         // given
-        UserCash userCash = userService.depositUserCash(userDetails.getUser(), 20000);
         Order order = orderservice.order(userDetails, orderWebDto);
 
         // when
@@ -119,10 +122,32 @@ class OrderServiceTest {
 
         // then
         assertEquals("Order 주문 상태가 PaymentCompleted 로 변경되어야 합니다."
-                , order.getDelivery().getStatus(), DeliveryStatus.PaymentCompleted);
-        assertEquals("상품을 구매한 User 보유 금액이 변경되어야 합니다. (사용자가 보유한 금액 - 구매한 상품 가격)"
-                , userCash.getMoney(), 10000);
+                , order.getOrderStatus(), OrderStatus.PaymentCompleted);
         assertEquals("구매한 상품의 수량이 줄어들어야 합니다. 1000 -> 990"
                 , order.getOrderProduct().get(0).getProduct().getStockQuantity(), 990);
+        assertEquals("상품을 구매한 User 보유 금액이 변경되어야 합니다. (사용자가 보유한 금액 - 구매한 상품 가격)"
+                , userCash.getMoney(), 10000);
     }
+
+    @Test
+    @DisplayName("나의 주문 전체 결재하기")
+    void findByOrders() throws Exception {
+        //given
+        orderservice.order(userDetails, orderWebDto);
+        Order order2 = orderservice.order(userDetails, orderWebDto);
+
+        System.out.println("=========================");
+        System.out.println(userDetails.getUser().getOrder().size());
+        System.out.println("=========================");
+
+        orderservice.payForTheOrder(userDetails, order2.getId());
+
+        // when
+        orderservice.payForTheOrders(userDetails);
+
+        // then
+        assertEquals("결재 완료된 상품을 제외하고 결재되어야 합니다."
+                , userCash.getMoney(), 10000);
+    }
+
 }
