@@ -7,10 +7,7 @@ import com.example.janghj.domain.Order;
 import com.example.janghj.domain.Product.Product;
 import com.example.janghj.domain.Product.ProductColor;
 import com.example.janghj.domain.User.User;
-import com.example.janghj.repository.OrderRepository;
-import com.example.janghj.repository.ProductRepository;
-import com.example.janghj.repository.UserRepository;
-import com.example.janghj.repository.UserRepositoryImpl;
+import com.example.janghj.repository.*;
 import com.example.janghj.repository.dto.UserOrderDto;
 import com.example.janghj.repository.dto.UserOrderSearchDto;
 import com.example.janghj.service.OrderService;
@@ -29,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -38,6 +36,8 @@ import static org.springframework.test.util.AssertionErrors.assertEquals;
 @ExtendWith(MockitoExtension.class)
 @Transactional
 public class UserOrderQueryDslTest {
+    @Autowired
+    QueryDslUserRepository queryDslUserRepository;
     @Autowired
     UserRepositoryImpl userRepositoryImpl;
     @Autowired
@@ -98,5 +98,31 @@ public class UserOrderQueryDslTest {
                 userOrderDto.getUser().getId(), user.getId());
         assertEquals("기존에 생성된 orderId 값과 QueryDsl 로 조회한 orderId 값이 일치해야 합니다.",
                 userOrderDto.getOrder().getId(), order.getId());
+    }
+
+    @Test
+    @DisplayName("QueryDsl userName 조회 성공")
+    void getUserName() {
+        // given
+
+        // when
+        List<User> allUser = queryDslUserRepository.findAllUser();
+
+        // then
+        assertEquals("UserRepository 찾아온 정보의 크기가 1이 되어야 합니다.",
+                allUser.size(), 1);
+    }
+
+    @Test
+    @DisplayName("QueryDsl userName 조회 성공")
+    void findByUsername() {
+        // given
+
+        // when
+        User findUser = queryDslUserRepository.findByUsername("username");
+
+        // then
+        assertEquals("username 이 같아야합니다.",
+                findUser.getUsername(), userDto.getUsername());
     }
 }
