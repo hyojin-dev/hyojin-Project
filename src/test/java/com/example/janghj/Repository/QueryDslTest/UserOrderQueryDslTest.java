@@ -13,10 +13,7 @@ import com.example.janghj.repository.dto.UserOrderSearchDto;
 import com.example.janghj.service.OrderService;
 import com.example.janghj.service.ProductService;
 import com.example.janghj.service.UserService;
-import com.example.janghj.web.dto.AddressDto;
-import com.example.janghj.web.dto.OrderWebDto;
-import com.example.janghj.web.dto.ProductDto;
-import com.example.janghj.web.dto.UserDto;
+import com.example.janghj.web.dto.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -85,7 +82,7 @@ public class QueryDslUserOrderRepositoryTest {
     }
 
     @Test
-    @DisplayName("QueryDsl 동적 쿼리 조회 성공")
+    @DisplayName("QueryDsl 동적 쿼리로 유저 주문 1개 조회 성공")
     void findOneUserOrder() throws Exception {
         // given
         UserOrderSearchDto userOrderSearchDto = new UserOrderSearchDto(user.getId(), order.getId());
@@ -101,7 +98,7 @@ public class QueryDslUserOrderRepositoryTest {
     }
 
     @Test
-    @DisplayName("QueryDsl 동적 쿼리 조회 성공")
+    @DisplayName("QueryDsl 동적 쿼리로 유저 주문 전체 조회 성공")
     void findAllUserOrders() throws Exception {
         // given
         UserOrderSearchDto userOrderSearchDto = new UserOrderSearchDto(user.getId());
@@ -110,7 +107,7 @@ public class QueryDslUserOrderRepositoryTest {
         List<UserOrderDto> findAllUserOrders = queryDslUserOrderRepository.findAllUserOrders(userOrderSearchDto);
 
         // then
-        assertEquals("기존에 생성된 orderId 값과 QueryDsl 로 조회한 orderId 값이 일치해야 합니다.",
+        assertEquals("queryDslUserOrderRepository 에서 찾아온 정보의 크기가 1이 되어야 합니다.",
                 findAllUserOrders.size(), 1);
     }
 
@@ -123,7 +120,7 @@ public class QueryDslUserOrderRepositoryTest {
         List<User> allUser = queryDslUserRepository.findAllUser();
 
         // then
-        assertEquals("UserRepository 찾아온 정보의 크기가 1이 되어야 합니다.",
+        assertEquals("queryDslUserOrderRepository 에서 찾아온 정보의 크기가 1이 되어야 합니다.",
                 allUser.size(), 1);
     }
 
