@@ -136,10 +136,4 @@ public class QueryDslUserOrderRepositoryTest {
         assertEquals("username 이 같아야 합니다.",
                 findUser.getUsername(), userDto.getUsername());
     }
-
-    @Test
-    @DisplayName("QueryDsl order 조회 성공")
-    void findOrder() {
-
-    }
 }
