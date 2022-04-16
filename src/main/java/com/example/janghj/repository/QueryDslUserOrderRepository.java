@@ -35,8 +35,8 @@ public class QueryDslUserOrderRepository {
     public List<UserOrderDto> findAllUserOrders(UserOrderSearchDto userOrderSearchDto) {
         return queryFactory
                 .select(new QUserOrderDto(
-                        user
-                        , order
+                        user,
+                        order
                 )).from(user)
                 .innerJoin(user.order, order)
                 .where(userIdEq(userOrderSearchDto.getUserId()))
