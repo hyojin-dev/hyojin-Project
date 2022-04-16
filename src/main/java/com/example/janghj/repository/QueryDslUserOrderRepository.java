@@ -13,7 +13,7 @@ import static com.example.janghj.domain.User.QUser.user;
 
 @Repository
 @RequiredArgsConstructor
-public class UserRepositoryImpl {
+public class QueryDslUserOrderRepository {
 
     private final JPAQueryFactory queryFactory;
 
@@ -35,6 +35,27 @@ public class UserRepositoryImpl {
     }
 
     private BooleanExpression orderIdEq(Long orderId) {
+        return orderId != null ? order.id.eq(Long.valueOf(orderId)) : null;
+    }
+
+    public UserOrderDto userOrderSearch2(UserOrderSearchDto userOrderSearchDto) {
+        return queryFactory
+                .select(new QUserOrderDto(
+                        user,
+                        order
+                ))
+                .from(user)
+                .join(user.order, order)
+                .where(userIdEq2(userOrderSearchDto.getUserId()),
+                        orderIdEq2(userOrderSearchDto.getOrderId()))
+                .fetchOne();
+    }
+
+    private BooleanExpression userIdEq2(Long userId) {
+        return userId != null ? user.id.eq(Long.valueOf(userId)) : null;
+    }
+
+    private BooleanExpression orderIdEq2(Long orderId) {
         return orderId != null ? order.id.eq(Long.valueOf(orderId)) : null;
     }
 }
