@@ -35,11 +35,11 @@ import static org.springframework.test.util.AssertionErrors.assertEquals;
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 @Transactional
-public class UserOrderQueryDslTest {
+public class QueryDslUserOrderRepositoryTest {
     @Autowired
     QueryDslUserRepository queryDslUserRepository;
     @Autowired
-    UserRepositoryImpl userRepositoryImpl;
+    com.example.janghj.repository.QueryDslUserOrderRepository queryDslUserOrderRepository;
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -85,19 +85,33 @@ public class UserOrderQueryDslTest {
     }
 
     @Test
-    @DisplayName("QueryDsl 동적 쿼리로 조회 성공")
-    void order() throws Exception {
+    @DisplayName("QueryDsl 동적 쿼리 조회 성공")
+    void findOneUserOrder() throws Exception {
         // given
         UserOrderSearchDto userOrderSearchDto = new UserOrderSearchDto(user.getId(), order.getId());
 
         // when
-        UserOrderDto userOrderDto = userRepositoryImpl.userOrderSearch(userOrderSearchDto);
+        UserOrderDto userOrderDto = queryDslUserOrderRepository.findOneUserOrder(userOrderSearchDto);
 
         // then
         assertEquals("기존에 생성된 userId 값과 QueryDsl 로 조회한 userId 값이 일치해야 합니다.",
                 userOrderDto.getUser().getId(), user.getId());
         assertEquals("기존에 생성된 orderId 값과 QueryDsl 로 조회한 orderId 값이 일치해야 합니다.",
                 userOrderDto.getOrder().getId(), order.getId());
+    }
+
+    @Test
+    @DisplayName("QueryDsl 동적 쿼리 조회 성공")
+    void findAllUserOrders() throws Exception {
+        // given
+        UserOrderSearchDto userOrderSearchDto = new UserOrderSearchDto(user.getId());
+
+        // when
+        List<UserOrderDto> findAllUserOrders = queryDslUserOrderRepository.findAllUserOrders(userOrderSearchDto);
+
+        // then
+        assertEquals("기존에 생성된 orderId 값과 QueryDsl 로 조회한 orderId 값이 일치해야 합니다.",
+                findAllUserOrders.size(), 1);
     }
 
     @Test
@@ -122,7 +136,13 @@ public class UserOrderQueryDslTest {
         User findUser = queryDslUserRepository.findByUsername("username");
 
         // then
-        assertEquals("username 이 같아야합니다.",
+        assertEquals("username 이 같아야 합니다.",
                 findUser.getUsername(), userDto.getUsername());
+    }
+
+    @Test
+    @DisplayName("QueryDsl order 조회 성공")
+    void findOrder() {
+
     }
 }
