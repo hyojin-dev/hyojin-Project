@@ -1,8 +1,8 @@
 package com.example.janghj.repository;
 
-import com.example.janghj.domain.Order;
-import com.example.janghj.repository.dto.*;
-import com.querydsl.core.types.Expression;
+import com.example.janghj.repository.dto.QUserOrderDto;
+import com.example.janghj.repository.dto.UserOrderDto;
+import com.example.janghj.repository.dto.UserOrderSearchDto;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
