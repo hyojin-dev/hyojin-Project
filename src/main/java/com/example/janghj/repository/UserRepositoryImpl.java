@@ -19,7 +19,9 @@ import static com.example.janghj.domain.User.QUser.user;
 
 @Repository
 public class UserRepositoryImpl implements UserRepositoryCustom {
-
+    /*
+    * 객체 조회가 아닌 상황에 따라 필요한 정보들만 조회 할 수 있도록 하자.
+    * */
     private final JPAQueryFactory queryFactory;
 
     public UserRepositoryImpl(JPAQueryFactory queryFactory) {
@@ -49,8 +51,10 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                 ))
                 .from(user)
                 .join(user.order, order)
-                .where(userIdEq(userOrderSearchDto.getUserId()),
-                        orderIdEq(userOrderSearchDto.getOrderId()))
+                .where(
+                        userIdEq(userOrderSearchDto.getUserId()),
+                        orderIdEq(userOrderSearchDto.getOrderId())
+                )
                 .fetchOne();
     }
 
@@ -62,7 +66,9 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                         order
                 )).from(user)
                 .innerJoin(user.order, order)
-                .where(userIdEq(userOrderSearchDto.getUserId()))
+                .where(
+                        userIdEq(userOrderSearchDto.getUserId())
+                )
                 .fetch();
     }
 
@@ -81,13 +87,15 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                 .limit(pageable.getPageSize())
                 .fetch();
 
+        // data 더 불러올 때 사용되는 기능
         JPAQuery<Long> countQuery = queryFactory
                 .select(user.count())
                 .from(user)
                 .innerJoin(user.order, order)
-                .where(userIdEq(userOrderSearchDto.getUserId())
+                .where(
+                        userIdEq(userOrderSearchDto.getUserId())
                 );
-
+        // contentSize < pageSize && 마지막 페이지일 경우 countQuery 를 실행하지 않는다.
         return PageableExecutionUtils.getPage(results, pageable, countQuery::fetchOne);
     }
 }
