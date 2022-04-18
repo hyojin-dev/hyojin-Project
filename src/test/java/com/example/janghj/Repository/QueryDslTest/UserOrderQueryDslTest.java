@@ -113,19 +113,6 @@ public class QueryDslUserOrderRepositoryTest {
 
     @Test
     @DisplayName("QueryDsl userName 조회 성공")
-    void getUserName() {
-        // given
-
-        // when
-        List<User> allUser = queryDslUserRepository.findAllUser();
-
-        // then
-        assertEquals("queryDslUserOrderRepository 에서 찾아온 정보의 크기가 1이 되어야 합니다.",
-                allUser.size(), 1);
-    }
-
-    @Test
-    @DisplayName("QueryDsl userName 조회 성공")
     void findByUsername() {
         // given
 
