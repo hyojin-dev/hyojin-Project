@@ -4,7 +4,7 @@ import com.example.janghj.domain.User.User;
 
 import java.util.List;
 
-public interface UserRepositoyCustom {
+public interface UserRepositoryCustom {
     List<User> findAllUser();
 
 
