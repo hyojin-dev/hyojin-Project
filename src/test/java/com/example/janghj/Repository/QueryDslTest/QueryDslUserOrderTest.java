@@ -7,13 +7,19 @@ import com.example.janghj.domain.Order;
 import com.example.janghj.domain.Product.Product;
 import com.example.janghj.domain.Product.ProductColor;
 import com.example.janghj.domain.User.User;
-import com.example.janghj.repository.*;
+import com.example.janghj.repository.OrderRepository;
+import com.example.janghj.repository.ProductRepository;
+import com.example.janghj.repository.UserRepository;
+import com.example.janghj.repository.UserRepositoryImpl;
 import com.example.janghj.repository.dto.UserOrderDto;
 import com.example.janghj.repository.dto.UserOrderSearchDto;
 import com.example.janghj.service.OrderService;
 import com.example.janghj.service.ProductService;
 import com.example.janghj.service.UserService;
-import com.example.janghj.web.dto.*;
+import com.example.janghj.web.dto.AddressDto;
+import com.example.janghj.web.dto.OrderWebDto;
+import com.example.janghj.web.dto.ProductDto;
+import com.example.janghj.web.dto.UserDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +27,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -32,11 +40,9 @@ import static org.springframework.test.util.AssertionErrors.assertEquals;
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 @Transactional
-public class QueryDslUserOrderRepositoryTest {
+public class QueryDslUserOrderTest {
     @Autowired
-    QueryDslUserRepository queryDslUserRepository;
-    @Autowired
-    com.example.janghj.repository.QueryDslUserOrderRepository queryDslUserOrderRepository;
+    UserRepositoryImpl userRepositoryImpl;
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -88,7 +94,7 @@ public class QueryDslUserOrderRepositoryTest {
         UserOrderSearchDto userOrderSearchDto = new UserOrderSearchDto(user.getId(), order.getId());
 
         // when
-        UserOrderDto userOrderDto = queryDslUserOrderRepository.findOneUserOrder(userOrderSearchDto);
+        UserOrderDto userOrderDto = userRepository.findOneUserOrder(userOrderSearchDto);
 
         // then
         assertEquals("기존에 생성된 userId 값과 QueryDsl 로 조회한 userId 값이 일치해야 합니다.",
@@ -104,23 +110,43 @@ public class QueryDslUserOrderRepositoryTest {
         UserOrderSearchDto userOrderSearchDto = new UserOrderSearchDto(user.getId());
 
         // when
-        List<UserOrderDto> findAllUserOrders = queryDslUserOrderRepository.findAllUserOrders(userOrderSearchDto);
+        List<UserOrderDto> findAllUserOrders = userRepository.findAllUserOrders(userOrderSearchDto);
 
         // then
-        assertEquals("queryDslUserOrderRepository 에서 찾아온 정보의 크기가 1이 되어야 합니다.",
+        assertEquals("userRepository 에서 찾아온 정보의 크기가 1이 되어야 합니다.",
                 findAllUserOrders.size(), 1);
     }
 
     @Test
     @DisplayName("QueryDsl userName 조회 성공")
-    void findByUsername() {
+    void getUserName() {
         // given
 
         // when
-        User findUser = queryDslUserRepository.findByUsername("username");
+        List<User> allUser = userRepository.findAllUser();
 
         // then
-        assertEquals("username 이 같아야 합니다.",
-                findUser.getUsername(), userDto.getUsername());
+        assertEquals("userRepository 에서 찾아온 정보의 크기가 1이 되어야 합니다.",
+                allUser.size(), 1);
+    }
+
+    @Test
+    @DisplayName("Spring Data Page 를 이용하여 User, Order 조회 성공")
+    void PageTest() {
+        // given
+        for (int i = 0; i < 10; i++) {
+            this.order = orderservice.order(userDetails, orderWebDto);
+        }
+        UserOrderSearchDto userOrderSearchDto = new UserOrderSearchDto(user.getId());
+        PageRequest page = PageRequest.of(0, 3);
+
+        // when
+        Page<UserOrderDto> findPageUserOrders = userRepository.findPageUserOrders(userOrderSearchDto, page);
+
+        // then
+        assertEquals("Page 로 찾아온 정보의 수만큼 정보를 가져와야 한다.",
+                findPageUserOrders.getSize(), 3);
+        assertEquals("Page 로 찾아온 정보와 저장했던 값이 같아야 한다.",
+                findPageUserOrders.getContent().get(2).getUser().getUsername(), "username");
     }
 }
