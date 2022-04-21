@@ -5,14 +5,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.*;
 
 import static javax.persistence.FetchType.LAZY;
 
 @Entity
-@Setter
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderProduct {
@@ -33,7 +31,7 @@ public class OrderProduct {
 
     private int orderPrice; //주문 가격
     private int count; //주문 수량
-    private int amount;
+    private int amount; // 주문 전체 가격
 
     public OrderProduct(Product product, int orderPrice, Order order, int count, int amount) {
         this.product = product;
