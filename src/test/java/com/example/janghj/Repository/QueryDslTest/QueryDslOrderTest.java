@@ -8,10 +8,7 @@ import com.example.janghj.domain.Order;
 import com.example.janghj.domain.Product.Product;
 import com.example.janghj.domain.Product.ProductColor;
 import com.example.janghj.domain.User.User;
-import com.example.janghj.repository.OrderRepository;
-import com.example.janghj.repository.ProductRepository;
-import com.example.janghj.repository.UserRepository;
-import com.example.janghj.repository.UserRepositoryImpl;
+import com.example.janghj.repository.*;
 import com.example.janghj.service.OrderService;
 import com.example.janghj.service.ProductService;
 import com.example.janghj.service.UserService;
@@ -20,6 +17,8 @@ import com.example.janghj.web.dto.OrderWebDto;
 import com.example.janghj.web.dto.ProductDto;
 import com.example.janghj.web.dto.UserDto;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,4 +77,18 @@ public class QueryDslOrderTest {
         this.orderWebDto = new OrderWebDto(orderList, new Address("city", "street", "zipcode"));
         this.order = orderservice.order(userDetails, orderWebDto);
     }
+
+    @Test
+    @DisplayName("QueryDsl 동적 쿼리로 조회 성공")
+    void order() throws Exception {
+        // given
+        User user = userService.registerUser(userDto);
+        Order order = orderservice.order(userDetails, orderWebDto);
+
+        // when
+
+        // then
+    }
+
+
 }
