@@ -38,7 +38,7 @@ public class SearchRepositoryImpl {
     }
 
     private BooleanExpression orderProductEq(String orderProduct) {
-        return hasText(orderProduct) ? product.name.eq(orderProduct) : null;
+        return hasText(orderProduct) ? order.orderProduct.get(0).product.name.eq(orderProduct) : null;
     }
 
     private BooleanExpression productEq(String product) {
@@ -55,7 +55,6 @@ public class SearchRepositoryImpl {
                 )).from(user, product)
                 .innerJoin(user.order, order)
                 .innerJoin(order.orderProduct, orderProduct)
-                .innerJoin(product)
                 .where(
                         userEq(userOrderProductSearchDto.getUserSearch()),
                         orderEq(userOrderProductSearchDto.getOrderSearch()),
