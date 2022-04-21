@@ -11,4 +11,8 @@ public class UserOrderSearchDto {
         this.userId = userId;
         this.orderId = orderId;
     }
+
+    public UserOrderSearchDto(Long userId) {
+        this.userId = userId;
+    }
 }

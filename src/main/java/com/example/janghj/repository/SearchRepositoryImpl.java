@@ -1,110 +1,68 @@
-package com.example.janghj.Repository.QueryDslTest;
+package com.example.janghj.repository;
 
-import com.example.janghj.config.security.UserDetailsImpl;
-import com.example.janghj.domain.Address;
-import com.example.janghj.domain.Category;
-import com.example.janghj.domain.Order;
-import com.example.janghj.domain.Product.Product;
-import com.example.janghj.domain.Product.ProductColor;
-import com.example.janghj.domain.User.User;
-import com.example.janghj.repository.*;
+import com.example.janghj.domain.Product.QProduct;
+import com.example.janghj.domain.QOrder;
+import com.example.janghj.domain.User.QUser;
+import com.example.janghj.repository.dto.QUserOrderProductDto;
 import com.example.janghj.repository.dto.UserOrderProductDto;
 import com.example.janghj.repository.dto.UserOrderProductSearchDto;
-import com.example.janghj.service.OrderService;
-import com.example.janghj.service.ProductService;
-import com.example.janghj.service.UserService;
-import com.example.janghj.web.dto.AddressDto;
-import com.example.janghj.web.dto.OrderWebDto;
-import com.example.janghj.web.dto.ProductDto;
-import com.example.janghj.web.dto.UserDto;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-import static org.springframework.test.util.AssertionErrors.assertEquals;
+import static com.example.janghj.domain.Product.QProduct.product;
+import static com.example.janghj.domain.QOrder.order;
+import static com.example.janghj.domain.QOrderProduct.orderProduct;
+import static com.example.janghj.domain.User.QUser.user;
+import static org.springframework.util.StringUtils.hasText;
 
-@SpringBootTest
-@ExtendWith(MockitoExtension.class)
-@Transactional
-public class QueryDslUserOrderProductTest {
-    @Autowired
-    UserRepositoryImpl userRepositoryImpl;
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    UserService userService;
-    @Autowired
-    ProductService productService;
-    @Autowired
-    ProductRepository productRepository;
-    @Autowired
-    OrderService orderservice;
-    @Autowired
-    OrderRepository orderRepository;
-    @Autowired
-    SearchRepositoryImpl searchRepositoryImpl;
+@Repository
+public class SearchRepositoryImpl {
+    /*
+     * 객체 조회가 아닌 상황에 따라 필요한 정보들만 조회 할 수 있도록 하자.
+     * */
+    private final JPAQueryFactory queryFactory;
 
-    User user;
-    UserDetailsImpl userDetails;
-    Product product;
-    Order order;
-
-    @BeforeEach
-    void beforeEach() {
-        UserDto userDto = new UserDto("username",
-                "password",
-                "email",
-                new AddressDto("city", "street", "zipcode"));
-
-        this.user = userService.registerUser(userDto);
-        this.userDetails = new UserDetailsImpl(user);
-
-        ProductDto orderProductDto = new ProductDto("TestOrderProduct", 1000, 1000, Category.TOP, ProductColor.RED, 130);
-        productService.registerProduct(orderProductDto);
-
-        this.product = productRepository.findByName("TestOrderProduct");
-
-        Map orderList = new ConcurrentHashMap<String, Integer>();
-        String productId = product.getId().toString();
-        Integer quantity = 10;
-        orderList.put(productId, quantity);
-
-        OrderWebDto orderWebDto = new OrderWebDto(orderList, new Address("city", "street", "zipcode"));
-        this.order = orderservice.order(userDetails, orderWebDto);
+    public SearchRepositoryImpl(JPAQueryFactory queryFactory) {
+        this.queryFactory = queryFactory;
     }
 
-    @Test
-    @DisplayName("QueryDsl User, Order, Product 검색 성공")
-    void PageTest() {
-        // given
-        // QueryDsl 동적 쿼리로 조회할 저장되는 상품
-        ProductDto productDto = new ProductDto("TestProduct", 1000, 1000, Category.TOP, ProductColor.RED, 130);
-        productService.registerProduct(productDto);
+    private BooleanExpression userEq(String user) {
+        return hasText(user) ? QUser.user.username.eq(user) : null;
+    }
 
-        Product ProductSearch = productRepository.findByName("TestProduct");
+    private BooleanExpression orderEq(String order) {
+        return hasText(order) ? QOrder.order.user.username.eq(order) : null;
+    }
 
-        UserOrderProductSearchDto userOrderProductSearchDto = new UserOrderProductSearchDto(null, null, null, "TestProduct");
+    private BooleanExpression orderProductEq(String orderProduct) {
+        return hasText(orderProduct) ? product.name.eq(orderProduct) : null;
+    }
 
-        // when
-        List<UserOrderProductDto> userOrderProductDto = searchRepositoryImpl.SearchUserOrderProduct(userOrderProductSearchDto);
+    private BooleanExpression productEq(String product) {
+        return hasText(product) ? QProduct.product.name.eq(product) : null;
+    }
 
-        // then
-        assertEquals("QueryDsl 로 찾아온 User ID와 저장된 ID 값이 같아야 한다.",
-                userOrderProductDto.get(0).getUser().getId(), user.getId());
-        assertEquals("QueryDsl 로 찾아온 Order ID와 저장된 ID 값이 같아야 한다.",
-                userOrderProductDto.get(0).getOrder().getId(), order.getId());
-        assertEquals("QueryDsl 로 찾아온 OrderProduct ID와 저장된 ID 값이 같아야 한다.",
-                userOrderProductDto.get(0).getOrderProduct().getId(), order.getOrderProduct().get(0).getId());
-        assertEquals("QueryDsl 로 찾아온 Product ID와 저장된 ID 값이 같아야 한다.",
-                userOrderProductDto.get(0).getProduct().getId(), ProductSearch.getId());
+    public List<UserOrderProductDto> SearchUserOrderProduct(UserOrderProductSearchDto userOrderProductSearchDto) {
+        List<UserOrderProductDto> fetch = queryFactory
+                .select(new QUserOrderProductDto(
+                        user,
+                        order,
+                        orderProduct,
+                        product
+                )).from(user, product)
+                .innerJoin(user.order, order)
+                .innerJoin(order.orderProduct, orderProduct)
+                .innerJoin(product)
+                .where(
+                        userEq(userOrderProductSearchDto.getUserSearch()),
+                        orderEq(userOrderProductSearchDto.getOrderSearch()),
+                        orderProductEq(userOrderProductSearchDto.getOrderProductSearch()),
+                        productEq(userOrderProductSearchDto.getProduct())
+                )
+                .fetch();
+        return fetch;
     }
 }

@@ -9,5 +9,4 @@ import java.util.Optional;
 @Repository
 public interface UserCashRepository extends JpaRepository<UserCash, Long> {
     Optional<UserCash> findByUserId(Long userId);
-
 }
