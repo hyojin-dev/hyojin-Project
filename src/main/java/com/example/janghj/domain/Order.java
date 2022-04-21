@@ -1,7 +1,6 @@
 package com.example.janghj.domain;
 
 import com.example.janghj.domain.User.User;
-import com.example.janghj.web.dto.OrderProduct;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
