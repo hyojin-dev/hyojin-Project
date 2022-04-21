@@ -35,7 +35,6 @@ public class OrderProduct {
     private int count; //주문 수량
     private int amount;
 
-
     public OrderProduct(Product product, int orderPrice, Order order, int count, int amount) {
         this.product = product;
         this.orderPrice = orderPrice;
