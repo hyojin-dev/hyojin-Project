@@ -3,7 +3,7 @@
 ![page test](https://user-images.githubusercontent.com/90826012/163757869-14dc89fe-bf61-48f4-b59e-d695636fdd4f.PNG)
 
 2022.04.18
-Spring Data Page 기능 적용 및 테스트 중입니다.
+Spring Data Page 기능 적용 및 테스트코드 작성하였습니다.
 
 ![QueryDsl](https://user-images.githubusercontent.com/90826012/163416354-e9cdf629-81f0-4fde-afa4-1245784bec8f.PNG)
 
