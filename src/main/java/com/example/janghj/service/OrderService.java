@@ -3,6 +3,7 @@ package com.example.janghj.service;
 import com.example.janghj.config.security.UserDetailsImpl;
 import com.example.janghj.domain.Delivery;
 import com.example.janghj.domain.Order;
+import com.example.janghj.domain.OrderProduct;
 import com.example.janghj.domain.OrderStatus;
 import com.example.janghj.domain.Product.Product;
 import com.example.janghj.domain.User.User;
@@ -10,7 +11,6 @@ import com.example.janghj.domain.User.UserCash;
 import com.example.janghj.repository.OrderRepository;
 import com.example.janghj.repository.ProductRepository;
 import com.example.janghj.repository.UserRepository;
-import com.example.janghj.web.dto.OrderProduct;
 import com.example.janghj.web.dto.OrderWebDto;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -42,7 +42,6 @@ public class OrderService {
         order.setDelivery(delivery);
 
         orderRepository.save(order);
-
         return order;
     }
 
@@ -124,13 +123,23 @@ public class OrderService {
             totalAmount += order.getTotalAmount();
             order.getDelivery().setStatus();
             canIBuyThis(user.getUserCash(), order);
+            order.setPaymentCompleted();
         }
+        canIBuyThis(user.getUserCash(), totalAmount);
+
         return totalAmount;
     }
 
     public Boolean canIBuyThis(UserCash userCash, Order order) {
         if (userCash.getMoney() < order.getTotalAmount()) {
             throw new ArithmeticException("보유한 금액(" + userCash.getMoney() + ")보다 상품의 가격(" + order.getTotalAmount() + ")이 높습니다.");
+        }
+        return true;
+    }
+
+    public Boolean canIBuyThis(UserCash userCash, int price) {
+        if (userCash.getMoney() < price) {
+            throw new ArithmeticException("보유한 금액(" + userCash.getMoney() + ")보다 상품의 가격(" + price + ")이 높습니다.");
         }
         return true;
     }
