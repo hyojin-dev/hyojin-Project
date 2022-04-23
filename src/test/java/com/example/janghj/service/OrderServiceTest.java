@@ -130,24 +130,22 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("나의 주문 전체 결재하기")
+    @DisplayName("결재 전 전체 상품 결재하기")
     void findByOrders() throws Exception {
         //given
-        orderservice.order(userDetails, orderWebDto);
+        // 결재가 완료된 주문이 존재하는 상태 보유금액
+        Order order1 = orderservice.order(userDetails, orderWebDto);
+        orderservice.payForTheOrder(userDetails, order1.getId());
+        // 현재 보유금액 = 10,000(20,000(기존보유금액)-10,000(order1상품금액))
+
+        // order1 는 결재가 완료되어 제외하고 order2 만 결재 되어야 합니다.
         Order order2 = orderservice.order(userDetails, orderWebDto);
-
-        System.out.println("=========================");
-        System.out.println(userDetails.getUser().getOrder().size());
-        System.out.println("=========================");
-
-        orderservice.payForTheOrder(userDetails, order2.getId());
 
         // when
         orderservice.payForTheOrders(userDetails);
 
         // then
-        assertEquals("결재 완료된 상품을 제외하고 결재되어야 합니다."
-                , userCash.getMoney(), 10000);
+        assertEquals("결재 완료된 상품(order1)을 제외하고 결재가 안된(order2) 상품만 결재되어야 합니다."
+                , userDetails.getUserCash().getMoney(), 0);
     }
-
 }
