@@ -24,11 +24,6 @@ public class UserCash extends Timestamped {
     public UserCash() {
     }
 
-//    public UserCash(User user) {
-//        this.user = user;
-//        this.money = 0;
-//    }
-
     public void depositUserCash(int cash) {
         this.money += cash;
     }
@@ -39,5 +34,4 @@ public class UserCash extends Timestamped {
         }
         this.money -= amount;
     }
-
 }
