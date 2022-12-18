@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -32,6 +33,10 @@ public class UserService {
 
     private final KakaoOAuth2 kakaoOAuth2;
     private final AuthenticationManager authenticationManager;
+
+    public List<User> test() {
+        return userRepository.findAll();
+    }
 
     @Transactional(rollbackFor = Throwable.class)
     public User registerUser(UserDto userDto) {
@@ -51,7 +56,6 @@ public class UserService {
                 .userCash(new UserCash())
                 .build();
         userRepository.save(user);
-
         return user;
     }
 

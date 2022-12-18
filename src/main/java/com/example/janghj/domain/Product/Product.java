@@ -51,6 +51,10 @@ public abstract class Product extends Timestamped {
         this.productColor = productDto.getProductColor();
     }
 
+    public void addQuantity(int salesQuantity) {
+        this.stockQuantity += salesQuantity;
+    }
+
     public void salesQuantity(int salesQuantity) {
         this.stockQuantity -= salesQuantity;
         if (salesQuantity <= 0) {

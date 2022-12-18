@@ -14,8 +14,7 @@ public class UserCash extends Timestamped {
     @Column(name = "user_cash_id")// 반드시 값을 가지도록 합니다.
     private Long id;
 
-    @JsonIgnore
-    @OneToOne(mappedBy = "userCash", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "userCash", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private User user;
 
     @Column(nullable = false)

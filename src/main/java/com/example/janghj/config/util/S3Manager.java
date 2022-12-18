@@ -1,5 +1,7 @@
 package com.example.janghj.config.util;
 
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
@@ -13,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,11 +30,19 @@ public class S3Manager {
 
     public String upload(MultipartFile multipartFile, String dirName) throws IOException {
         File uploadFile = convert(multipartFile)
-                .orElseThrow(() -> new IllegalArgumentException("MultipartFile -> File 변환 실패"));
-
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "error: MultipartFile -> File convert fail"
+                ));
         return upload(uploadFile, dirName);
     }
 
+    /**
+     * 고유한 파일 이름을 부여하여 S3 버킷에 업로드합니다.
+     *
+     * @param uploadFile 업로드 할 이미지 파일
+     * @param dirName    저장할 버킷 폴더 경로
+     * @return 저장된 버킷 이미지 url
+     */
     private String upload(File uploadFile, String dirName) {
         // S3에 저장되는 파일 이름(랜덤 uuid + 파일명)
         String fileName = dirName + "/" + UUID.randomUUID() + uploadFile.getName();
@@ -43,19 +52,38 @@ public class S3Manager {
         return cloudFrontUrl; // 업로드된 파일의 S3 URL 주소 반환
     }
 
+    /**
+     * 버킷에 이미지 파일을 업로드합니다.
+     *
+     * @param uploadFile 이미지 파일
+     * @param fileName   고유한 파일 이름
+     * @return 저장된 버킷 이미지 url
+     */
     private void putS3(File uploadFile, String fileName) {
         amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, uploadFile)
                 .withCannedAcl(CannedAccessControlList.PublicRead)); // PublicRead 권한으로 업로드
     }
 
+    /**
+     * 로컬에 파일을 지웁니다.
+     *
+     * @param targetFile 변환된 파일
+     */
     private void removeNewFile(File targetFile) {
         if (targetFile.delete()) {
-            log.info("로컬에 저장된 파일 삭제 완료");
+            log.info("File delete success");
         } else {
-            log.info("로컬에 저장된 파일 삭제 실패");
+            log.info("File delete fail");
         }
     }
 
+    /**
+     * 이미지 파일을 파일로 변환합니다.
+     *
+     * @param file 이미지 파일
+     * @return 변환된 파일 클래스
+     * @throws IOException
+     */
     private Optional<File> convert(MultipartFile file) throws IOException {
         File convertFile = new File(file.getOriginalFilename());
         if (convertFile.createNewFile()) {
@@ -64,15 +92,25 @@ public class S3Manager {
             }
             return Optional.of(convertFile);
         }
-
         return Optional.empty();
     }
 
+    /**
+     * 상품을 삭제합니다.
+     *
+     * @param reviewImgUrl
+     */
     public void delete(String reviewImgUrl) { // S3 파일 삭제
-        String filePath = reviewImgUrl.replace("https://dk9q1cr2zzfmc.cloudfront.net/", "");
-        // Delete 객체 생성
-        DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, filePath);
-        // 삭제
-        amazonS3Client.deleteObject(deleteObjectRequest);
+        try {
+//            String filePath = reviewImgUrl.replace("https://dk9q1cr2zzfmc.cloudfront.net/", "");
+            DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, reviewImgUrl);
+            amazonS3Client.deleteObject(deleteObjectRequest);
+        } catch (
+                AmazonServiceException e) {
+            e.printStackTrace();
+        } catch (
+                SdkClientException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -20,7 +20,7 @@ public class OrderProduct {
     private Long id;
 
     @JsonIgnore
-    @ManyToOne(fetch = LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
 
@@ -39,9 +39,5 @@ public class OrderProduct {
         this.order = order;
         this.count = count;
         this.amount = amount;
-    }
-
-    public void salesQuantity() {
-        this.product.salesQuantity(count);
     }
 }

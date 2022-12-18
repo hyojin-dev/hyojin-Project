@@ -23,11 +23,12 @@ public class TimeTraceAop {
             sw.stop();
             long executionTime = sw.getTotalTimeMillis();
 
-            // AOP가 적용된 메소드 위치 출력용
+            // AOP 적용 메소드 위치 출력용
             String className = joinPoint.getTarget().getClass().getName();
             String methodName = joinPoint.getSignature().getName();
             String task = className + "." + methodName;
 
+            System.out.println("[TimeTraceAop] " + task + "-->" + executionTime + "(ms)");
             log.debug("[TimeTraceAop] " + task + "-->" + executionTime + "(ms)");
         }
     }

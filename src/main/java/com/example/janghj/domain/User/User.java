@@ -43,10 +43,10 @@ public class User extends Timestamped {
     @Embedded
     private Address address;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Order> order = new ArrayList<>();
 
-    @JsonIgnore
     @OneToOne(fetch = LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_cash_id")
     private UserCash userCash;
@@ -87,5 +87,4 @@ public class User extends Timestamped {
     public void payForIt(int amount) {
         userCash.withdrawalUserCash(amount);
     }
-
 }

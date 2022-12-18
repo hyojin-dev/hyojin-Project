@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -34,9 +35,7 @@ public class OrderService {
                 () -> new NullPointerException("해당 유저가 존재하지 않습니다. id  = " + nowUser.getId()));
 
         Order order = new Order(user);
-
-        List<OrderProduct> orderProducts = getOrderProduct(order, orderWebDto);
-        order.setOrderProduct(orderProducts);
+        order.setOrderProduct(getOrderProduct(order, orderWebDto));
 
         Delivery delivery = new Delivery(order, orderWebDto.getAddress());
         order.setDelivery(delivery);
@@ -49,7 +48,6 @@ public class OrderService {
         List<OrderProduct> orderProducts = new ArrayList<>();
         orderWebDto.getOrderList().forEach((productId, quantity) ->
                 orderProducts.add(createOrderProduct(Long.parseLong((String) productId), (Integer) quantity, order)));
-
         return orderProducts;
     }
 
@@ -57,8 +55,8 @@ public class OrderService {
     public OrderProduct createOrderProduct(Long productId, int quantity, Order order) {
         Product product = (Product) productRepository.findById(productId).orElseThrow(
                 () -> new NullPointerException("해당 상품이 없습니다. productId =" + productId));
-        product.salesQuantity(quantity);
 
+        product.salesQuantity(quantity);
         int amount = product.getPrice() * quantity;
         return new OrderProduct(product, product.getPrice(), order, quantity, amount);
     }
@@ -79,7 +77,8 @@ public class OrderService {
 
     public Order findByOrder(UserDetailsImpl nowUser, Long orderId) {
         if (!nowUser.getUser().equals(nowUser.getUser())) {
-            throw new AccessDeniedException("유저(" + nowUser.getId() + ") 가 다른 유저(" + nowUser.getUser().getId() + ")에 접근하려고 합니다.");
+            throw new AccessDeniedException("유저(" + nowUser.getId() + ") 가 " +
+                    "다른 유저(" + nowUser.getUser().getId() + ")에 접근하려고 합니다.");
         }
         Order order = orderRepository.findById(orderId).orElseThrow(
                 () -> new NullPointerException("해당 주문이 존재하지 않습니다. itemId = " + orderId)
@@ -87,72 +86,86 @@ public class OrderService {
         return order;
     }
 
-    public List<Order> findByOrders(UserDetailsImpl nowUser) {
-        return orderRepository.findAllByUserId(nowUser.getId());
+    public List<Order> findByOrders(Long userId) {
+        return orderRepository.findAllByUserId(userId);
     }
 
     @Transactional(rollbackFor = Throwable.class)
     public Order payForTheOrder(UserDetailsImpl nowUser, Long orderId) throws Exception {
         Order order = findByOrder(nowUser, orderId);
-        User user = nowUser.getUser();
+        Optional<User> user = userRepository.findById(nowUser.getId());
 
-        canIBuyThis(user.getUserCash(), order);
-
-        user.payForIt(order.getTotalAmount());
-
+        canIBuyThis(user.get().getUserCash(), order);
+        user.get().payForIt(order.getTotalAmount());
         order.setPaymentCompleted();
+
         orderRepository.save(order);
+        userRepository.save(user.get());
         return order;
     }
 
     @Transactional(rollbackFor = Throwable.class)
     public void payForTheOrders(UserDetailsImpl nowUser) {
         List<Order> getOrders = findByDeliveryStatusOrders(nowUser, OrderStatus.WaitingForPayment);
-        User user = nowUser.getUser();
-        int totalAmount = setOrder(user, getOrders);
+        Optional<User> user = userRepository.findById(nowUser.getId());
 
-        user.payForIt(totalAmount);
+        UserCash userCash = user.get().getUserCash();
+        int totalAmount = setOrder(userCash, getOrders);
+        user.get().payForIt(totalAmount);
+    }
+
+    public int setOrder(UserCash userCash, List<Order> orders) {
+        int totalAmount = 0;
+        for (Order order : orders) {
+            totalAmount += order.getTotalAmount();
+            order.getDelivery().setStatus();
+            canIBuyThis(userCash, order);
+            order.setPaymentCompleted();
+        }
+        canIBuyThis(userCash, totalAmount);
+
+        return totalAmount;
     }
 
     public List<Order> findByDeliveryStatusOrders(UserDetailsImpl nowUser, OrderStatus orderStatus) {
         return orderRepository.findAllByUserIdAndOrderStatus(nowUser.getId(), orderStatus);
     }
 
-    public int setOrder(User user, List<Order> orders) {
-        int totalAmount = 0;
-        for (Order order : orders) {
-            totalAmount += order.getTotalAmount();
-            order.getDelivery().setStatus();
-            canIBuyThis(user.getUserCash(), order);
-            order.setPaymentCompleted();
-        }
-        canIBuyThis(user.getUserCash(), totalAmount);
-
-        return totalAmount;
-    }
-
     public Boolean canIBuyThis(UserCash userCash, Order order) {
         if (userCash.getMoney() < order.getTotalAmount()) {
-            throw new ArithmeticException("보유한 금액(" + userCash.getMoney() + ")보다 상품의 가격(" + order.getTotalAmount() + ")이 높습니다.");
+            throw new ArithmeticException(
+                    "보유한 금액(" + userCash.getMoney() + ")보다 상품의 가격(" + order.getTotalAmount() + ")이 높습니다.");
         }
         return true;
     }
 
     public Boolean canIBuyThis(UserCash userCash, int price) {
         if (userCash.getMoney() < price) {
-            throw new ArithmeticException("보유한 금액(" + userCash.getMoney() + ")보다 상품의 가격(" + price + ")이 높습니다.");
+            throw new ArithmeticException(
+                    "보유한 금액(" + userCash.getMoney() + ")보다 상품의 가격(" + price + ")이 높습니다.");
         }
         return true;
     }
 
-    public void orderCancel(UserDetailsImpl nowUser, Long orderId) {
+    public void cancelOrder(UserDetailsImpl nowUser, Long orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(
                 () -> new NullPointerException("해당 주문이 존재하지 않습니다. orderId = " + orderId)
         );
         if (order.getUser().getId() != nowUser.getId()) {
-            throw new AccessDeniedException("유저(" + nowUser.getId() + ") 가 다른 유저(" + order.getUser().getId() + ")의 Order 에게 접근하려고 합니다.");
+            throw new AccessDeniedException("유저(" + nowUser.getId() + ") 가 " +
+                    "다른 유저(" + order.getUser().getId() + ")의 Order 에 접근하고 있습니다.");
         }
+        List<Product> addProduct = new ArrayList<>();
+        order.getOrderProduct().forEach(orderProduct -> {
+            addProduct.add(cancelOrderProduct(orderProduct.getProduct(), orderProduct.getCount()));
+        });
+        productRepository.saveAll(addProduct);
         orderRepository.deleteById(orderId);
+    }
+
+    private Product cancelOrderProduct(Product product, int quantity) {
+        product.addQuantity(quantity);
+        return product;
     }
 
     @Transactional(readOnly = true, rollbackFor = Throwable.class)
