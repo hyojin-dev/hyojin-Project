@@ -49,6 +49,7 @@ public class OrderService {
         List<OrderProduct> orderProducts = new ArrayList<>();
         orderWebDto.getOrderList().forEach((productId, quantity) ->
                 orderProducts.add(createOrderProduct(Long.parseLong((String) productId), (Integer) quantity, order)));
+
         return orderProducts;
     }
 
