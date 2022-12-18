@@ -22,7 +22,8 @@ public class OrderController {
 
     @Operation(description = "주문 하기, 로그인 필요, 결재 필요", method = "POST")
     @PostMapping("/order")
-    public ResponseEntity<?> order(@AuthenticationPrincipal UserDetailsImpl nowUser, @RequestBody OrderWebDto orderWebDto) {
+    public ResponseEntity<?> order(@AuthenticationPrincipal UserDetailsImpl nowUser,
+                                   @RequestBody OrderWebDto orderWebDto) {
         if (nowUser.getAddress() == null) {
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
@@ -32,7 +33,9 @@ public class OrderController {
 
     @Operation(description = "주문 수정하기, 로그인 필요", method = "PUT")
     @PutMapping("/order")
-    public void updateOrder(@AuthenticationPrincipal UserDetailsImpl nowUser, @PathVariable Long orderId, @RequestBody OrderWebDto orderWebDto) {
+    public void updateOrder(@AuthenticationPrincipal UserDetailsImpl nowUser,
+                            @PathVariable Long orderId,
+                            @RequestBody OrderWebDto orderWebDto) {
         orderService.updateOrder(nowUser, orderId, orderWebDto);
     }
 
@@ -44,9 +47,10 @@ public class OrderController {
 
     @Operation(description = "주문 취소, 로그인 필요", method = "DELETE")
     @DeleteMapping("/order/{orderId}")
-    public ResponseEntity<?> cancelOrder(@AuthenticationPrincipal UserDetailsImpl nowUser, @PathVariable Long orderId) {
+    public ResponseEntity<?> cancelOrder(@AuthenticationPrincipal UserDetailsImpl nowUser,
+                                         @PathVariable Long orderId) {
         try {
-            orderService.orderCancel(nowUser, orderId);
+            orderService.cancelOrder(nowUser, orderId);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (AccessDeniedException e) {
             throw new AccessDeniedException("해당 주문에 접근할 권한이 없습니다.");
@@ -63,7 +67,8 @@ public class OrderController {
 
     @Operation(description = "1개 주문 결재 하기, 로그인 필요,", method = "POST")
     @PostMapping("/order/payment")
-    public ResponseEntity<?> payForTheOrder(@AuthenticationPrincipal UserDetailsImpl nowUser, @PathVariable Long orderId) {
+    public ResponseEntity<?> payForTheOrder(@AuthenticationPrincipal UserDetailsImpl nowUser,
+                                            @PathVariable Long orderId) {
         try { // AOP 작업 예정
             orderService.payForTheOrder(nowUser, orderId);
             return new ResponseEntity<>(HttpStatus.OK);

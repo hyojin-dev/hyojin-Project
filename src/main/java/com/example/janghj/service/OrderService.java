@@ -86,8 +86,8 @@ public class OrderService {
         return order;
     }
 
-    public List<Order> findByOrders(Long userId) {
-        return orderRepository.findAllByUserId(userId);
+    public List<Order> findByOrders(UserDetailsImpl nowUser) {
+        return orderRepository.findAllByUserId(nowUser.getId());
     }
 
     @Transactional(rollbackFor = Throwable.class)
