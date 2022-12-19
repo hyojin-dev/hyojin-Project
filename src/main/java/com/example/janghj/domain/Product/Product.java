@@ -56,9 +56,9 @@ public abstract class Product extends Timestamped {
     }
 
     public void salesQuantity(int salesQuantity) {
-        this.stockQuantity -= salesQuantity;
-        if (salesQuantity <= 0) {
-            throw new ArithmeticException();
+        if (this.stockQuantity < salesQuantity || salesQuantity <= 0) {
+            throw new NullPointerException();
         }
+        this.stockQuantity -= salesQuantity;
     }
 }

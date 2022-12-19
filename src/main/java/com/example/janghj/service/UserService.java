@@ -103,6 +103,15 @@ public class UserService {
         return user;
     }
 
+    public User findByUser(Long userId) {
+        return userRepository.findById(userId).orElseThrow(
+                () -> new NullPointerException("해당 사용자가 없습니다. userId =" + userId));
+    }
+
+    public void saveUser(User user) {
+        userRepository.save(user);
+    }
+
     public void kakaoLogin(String authorizedCode) {
         // 카카오 OAuth2 를 통해 카카오 사용자 정보 조회
         KakaoUserInfo userInfo = kakaoOAuth2.getUserInfo(authorizedCode);

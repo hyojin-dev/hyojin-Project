@@ -23,9 +23,8 @@ public class ProductController {
 
     @Operation(description = "상품 등록하기, 로그인 필요", method = "POST")
     @PostMapping("/product")
-    public ResponseEntity<?> registerProduct(@AuthenticationPrincipal UserDetailsImpl nowUser, @RequestBody ProductDto productDto) {
-        /* Product 엔티티가 증가할 수록 해당 코드가 함께 증가합니다.
-         * 개선되어야 할 코드 리팩토링 예정입니다.*/
+    public ResponseEntity<?> registerProduct(@AuthenticationPrincipal UserDetailsImpl nowUser,
+                                             @RequestBody ProductDto productDto) {
         if (nowUser.getUserRole() == UserRole.USER) {
             new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -41,7 +40,9 @@ public class ProductController {
 
     @Operation(description = "상품 업데이트, 로그인 필요", method = "PUT")
     @PutMapping("/product")
-    public Product updateProduct(@AuthenticationPrincipal UserDetailsImpl nowUser, @PathVariable Long productId, @RequestBody ProductDto productDto) {
+    public Product updateProduct(@AuthenticationPrincipal UserDetailsImpl nowUser,
+                                 @PathVariable Long productId,
+                                 @RequestBody ProductDto productDto) {
         if (nowUser.getUserRole() != UserRole.ADMIN) {
             new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -56,13 +57,13 @@ public class ProductController {
     }
 
     @Operation(description = "상품 삭제하기, 로그인 필요", method = "DELETE")
-    @DeleteMapping("/product")
-    public ResponseEntity<?> deleteProduct(@AuthenticationPrincipal UserDetailsImpl nowUser, @PathVariable Long productId) {
+    @DeleteMapping("/product/{productId}")
+    public ResponseEntity<?> deleteProduct(@AuthenticationPrincipal UserDetailsImpl nowUser,
+                                           @PathVariable Long productId) {
         if (nowUser.getUserRole() != UserRole.ADMIN) {
             new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-
-        productService.deleteProduct(nowUser, productId);
+        productService.deleteProduct(productId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

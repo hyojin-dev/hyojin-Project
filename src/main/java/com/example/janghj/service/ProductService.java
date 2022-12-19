@@ -6,7 +6,6 @@ import com.example.janghj.domain.Product.Pants;
 import com.example.janghj.domain.Product.Product;
 import com.example.janghj.domain.Product.Shoes;
 import com.example.janghj.domain.Product.Top;
-import com.example.janghj.domain.User.UserRole;
 import com.example.janghj.repository.ProductRepository;
 import com.example.janghj.web.dto.ProductDto;
 import lombok.RequiredArgsConstructor;
@@ -66,10 +65,7 @@ public class ProductService {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void deleteProduct(UserDetailsImpl nowUser, Long itemId) {
-        if (!nowUser.getUserRole().equals(UserRole.ADMIN)) {
-            return;
-        }
-        productRepository.deleteById(itemId);
+    public void deleteProduct(Long productId) {
+        productRepository.deleteById(productId);
     }
 }

@@ -3,15 +3,16 @@ package com.example.janghj.web.dto;
 import com.example.janghj.domain.Category;
 import com.example.janghj.domain.Product.ProductColor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 public class ProductDto {
     String name = "";
     int price = 0;
     int stockQuantity = 0;
     Category category; // TOP, PANTS, OUTER, SHOES, BAG
     ProductColor productColor; // RED, ORANGE, YELLOW, GREEN, BLUE, NAVY, PURPLE
-
     int size = 0;
 
     // Test 용도

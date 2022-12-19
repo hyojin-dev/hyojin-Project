@@ -10,31 +10,25 @@ import com.example.janghj.domain.User.User;
 import com.example.janghj.domain.User.UserCash;
 import com.example.janghj.repository.OrderRepository;
 import com.example.janghj.repository.ProductRepository;
-import com.example.janghj.repository.UserRepository;
 import com.example.janghj.web.dto.OrderWebDto;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Transactional(rollbackFor = Throwable.class)
-    public Order order(UserDetailsImpl nowUser, OrderWebDto orderWebDto) {
-        User user = userRepository.findById(nowUser.getId()).orElseThrow(
-                () -> new NullPointerException("해당 유저가 존재하지 않습니다. id  = " + nowUser.getId()));
-
-        Order order = new Order(user);
+    public Order order(UserDetailsImpl nowUser, OrderWebDto orderWebDto) throws Throwable {
+        Order order = new Order(userService.findByUser(nowUser.getId()));
         order.setOrderProduct(getOrderProduct(order, orderWebDto));
 
         Delivery delivery = new Delivery(order, orderWebDto.getAddress());
@@ -46,13 +40,17 @@ public class OrderService {
 
     public List<OrderProduct> getOrderProduct(Order order, OrderWebDto orderWebDto) {
         List<OrderProduct> orderProducts = new ArrayList<>();
-        orderWebDto.getOrderList().forEach((productId, quantity) ->
-                orderProducts.add(createOrderProduct(Long.parseLong((String) productId), (Integer) quantity, order)));
+        orderWebDto.getOrderList().forEach((productId, quantity) -> {
+            try {
+                orderProducts.add(createOrderProduct(Long.parseLong((String) productId), (Integer) quantity, order));
+            } catch (Throwable e) {
+                throw new NullPointerException("해당 상품이 존재하지 않거나 재고가 부족합니다. productId = " + productId);
+            }
+        });
         return orderProducts;
     }
 
-    @SneakyThrows
-    public OrderProduct createOrderProduct(Long productId, int quantity, Order order) {
+    public OrderProduct createOrderProduct(Long productId, int quantity, Order order) throws Throwable {
         Product product = (Product) productRepository.findById(productId).orElseThrow(
                 () -> new NullPointerException("해당 상품이 없습니다. productId =" + productId));
 
@@ -62,7 +60,7 @@ public class OrderService {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public Order updateOrder(UserDetailsImpl nowUser, Long orderId, OrderWebDto orderWebDto) {
+    public Order updateOrder(UserDetailsImpl nowUser, Long orderId, OrderWebDto orderWebDto) throws Throwable {
         Order order = findByOrder(nowUser, orderId);
         List<OrderProduct> orderProducts = getOrderProduct(order, orderWebDto);
         order.setOrderProduct(orderProducts);
@@ -93,25 +91,25 @@ public class OrderService {
     @Transactional(rollbackFor = Throwable.class)
     public Order payForTheOrder(UserDetailsImpl nowUser, Long orderId) throws Exception {
         Order order = findByOrder(nowUser, orderId);
-        Optional<User> user = userRepository.findById(nowUser.getId());
+        User user = userService.findByUser(nowUser.getId());
 
-        canIBuyThis(user.get().getUserCash(), order);
-        user.get().payForIt(order.getTotalAmount());
+        canIBuyThis(user.getUserCash(), order);
+        user.payForIt(order.getTotalAmount());
         order.setPaymentCompleted();
 
         orderRepository.save(order);
-        userRepository.save(user.get());
+        userService.saveUser(user);
         return order;
     }
 
     @Transactional(rollbackFor = Throwable.class)
     public void payForTheOrders(UserDetailsImpl nowUser) {
-        List<Order> getOrders = findByDeliveryStatusOrders(nowUser, OrderStatus.WaitingForPayment);
-        Optional<User> user = userRepository.findById(nowUser.getId());
+        List<Order> getOrders = findByDeliveryStatusOrders(nowUser.getId(), OrderStatus.WaitingForPayment);
+        User user = userService.findByUser(nowUser.getId());
 
-        UserCash userCash = user.get().getUserCash();
+        UserCash userCash = user.getUserCash();
         int totalAmount = setOrder(userCash, getOrders);
-        user.get().payForIt(totalAmount);
+        user.payForIt(totalAmount);
     }
 
     public int setOrder(UserCash userCash, List<Order> orders) {
@@ -127,8 +125,8 @@ public class OrderService {
         return totalAmount;
     }
 
-    public List<Order> findByDeliveryStatusOrders(UserDetailsImpl nowUser, OrderStatus orderStatus) {
-        return orderRepository.findAllByUserIdAndOrderStatus(nowUser.getId(), orderStatus);
+    public List<Order> findByDeliveryStatusOrders(Long userId, OrderStatus orderStatus) {
+        return orderRepository.findAllByUserIdAndOrderStatus(userId, orderStatus);
     }
 
     public Boolean canIBuyThis(UserCash userCash, Order order) {

@@ -45,7 +45,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
 //                인증 과정 필요 없음
 //                .antMatchers(HttpMethod.POST, "/..").permitAll()
-
 //                인증 과정 필요함
 //                .antMatchers(HttpMethod.GET, "/..").authenticated()
                 .antMatchers(HttpMethod.PUT, "/securityTest/**").authenticated()
@@ -54,6 +53,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // .anyRequest().authenticated()
                 // 그 외 모든 요청은 허용
                 .anyRequest().permitAll()
+
                 .and()
                 // 정상적인 토큰이 없을 경우
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)

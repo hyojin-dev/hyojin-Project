@@ -105,7 +105,7 @@ class OrderServiceTest {
         Order order = orderservice.order(userDetails, orderWebDto);
 
         // when
-        orderservice.orderCancel(userDetails, order.getId());
+        orderservice.cancelOrder(userDetails, order.getId());
 
         // then
         assertEquals("저장된 주문이 삭제되어 orderRepository 의 크기가 0 이 되어야 합니다.", orderRepository.findAll().size(), 0);

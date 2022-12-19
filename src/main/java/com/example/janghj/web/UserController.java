@@ -75,7 +75,8 @@ public class UserController {
 
     @Operation(description = "유저 현금 충전하기, 로그인 필요", method = "POST")
     @PostMapping("/user/cash")
-    public ResponseEntity<?> depositUserCash(@AuthenticationPrincipal UserDetailsImpl nowUser, @RequestPart(required = false) int readyCash) {
+    public ResponseEntity<?> depositUserCash(@AuthenticationPrincipal UserDetailsImpl nowUser,
+                                             @RequestPart(required = false) int readyCash) {
         try {
             userService.depositUserCash(nowUser.getUser(), readyCash);
             return new ResponseEntity<>(HttpStatus.OK);

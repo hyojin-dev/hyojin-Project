@@ -23,7 +23,7 @@ public class OrderController {
     @Operation(description = "주문 하기, 로그인 필요, 결재 필요", method = "POST")
     @PostMapping("/order")
     public ResponseEntity<?> order(@AuthenticationPrincipal UserDetailsImpl nowUser,
-                                   @RequestBody OrderWebDto orderWebDto) {
+                                   @RequestBody OrderWebDto orderWebDto) throws Throwable {
         if (nowUser.getAddress() == null) {
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
@@ -35,7 +35,7 @@ public class OrderController {
     @PutMapping("/order")
     public void updateOrder(@AuthenticationPrincipal UserDetailsImpl nowUser,
                             @PathVariable Long orderId,
-                            @RequestBody OrderWebDto orderWebDto) {
+                            @RequestBody OrderWebDto orderWebDto) throws Throwable {
         orderService.updateOrder(nowUser, orderId, orderWebDto);
     }
 
