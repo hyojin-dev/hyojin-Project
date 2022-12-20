@@ -6,6 +6,7 @@ import com.example.janghj.domain.Address;
 import com.example.janghj.domain.User.User;
 import com.example.janghj.domain.User.UserRole;
 import com.example.janghj.repository.userCart.UserCartRepositoryImpl;
+import com.example.janghj.repository.userCart.dto.UserCartDto;
 import com.example.janghj.service.UserService;
 import com.example.janghj.web.dto.JwtTokenDto;
 import com.example.janghj.web.dto.UserDto;
@@ -22,6 +23,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static com.example.janghj.web.dto.basic.BasicResponse.build;
 import static com.example.janghj.web.dto.basic.StatusCode.OK;
 import static org.springframework.http.ResponseEntity.ok;
@@ -34,6 +37,8 @@ public class UserController {
     private final JwtTokenUtil jwtTokenUtil;
     private final UserDetailsService userDetailsService;
     private final UserService userService;
+    private final UserCartRepositoryImpl userCartRepository;
+
 
     @Operation(description = "회원가입 시 아이디 유효성 검사", method = "GET")
     @GetMapping("/users/signup/check")
@@ -101,8 +106,8 @@ public class UserController {
     @GetMapping("/user/carts")
     public ResponseEntity<?> getUserCarts(@AuthenticationPrincipal UserDetailsImpl nowUser) {
         try {
-//            List<UserCart> userCarts = userService.getUserCarts(nowUser);
-            return ok().body(build(OK, "유저의 장바구니에 담겨있는지 확인 성공"));
+            List<UserCartDto> allByUserCartDto = userCartRepository.findAllByUserCartDto(nowUser.getId());
+            return ok().body(build(OK, "유저의 장바구니 쿼리 테스트", allByUserCartDto));
         } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -114,7 +119,6 @@ public class UserController {
     @GetMapping("/user/cart/{productId}")
     public ResponseEntity<?> getUserCart(@AuthenticationPrincipal UserDetailsImpl nowUser,
                                          @PathVariable Long productId) {
-
         try {
             boolean checkUserCart = userService.checkUserCart(nowUser, productId);
             return ok().body(build(OK, "유저의 장바구니에 담겨있는지 확인 성공", checkUserCart));
@@ -138,6 +142,7 @@ public class UserController {
             return ResponseEntity.badRequest().body(BasicResponse.build(StatusCode.BAD_REQUEST, e.getMessage()));
         }
     }
+
 
     @GetMapping("/user/login/kakao")
     public String kakaoLogin(String code) {
