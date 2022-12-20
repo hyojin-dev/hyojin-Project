@@ -44,6 +44,8 @@ public class QUser extends EntityPathBase<User> {
 
     public final EnumPath<UserRole> role = createEnum("role", UserRole.class);
 
+    public final ListPath<UserCart, QUserCart> userCart = this.<UserCart, QUserCart>createList("userCart", UserCart.class, QUserCart.class, PathInits.DIRECT2);
+
     public final QUserCash userCash;
 
     public final StringPath username = createString("username");

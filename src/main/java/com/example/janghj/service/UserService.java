@@ -5,8 +5,10 @@ import com.example.janghj.config.security.kakao.KakaoOAuth2;
 import com.example.janghj.config.security.kakao.KakaoUserInfo;
 import com.example.janghj.domain.Address;
 import com.example.janghj.domain.User.User;
+import com.example.janghj.domain.User.UserCart;
 import com.example.janghj.domain.User.UserCash;
 import com.example.janghj.domain.User.UserRole;
+import com.example.janghj.repository.UserCartRepository;
 import com.example.janghj.repository.UserCashRepository;
 import com.example.janghj.repository.UserRepository;
 import com.example.janghj.web.dto.UserDto;
@@ -30,6 +32,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final UserCashRepository userCashRepository;
+    private final UserCartRepository userCartRepository;
 
     private final KakaoOAuth2 kakaoOAuth2;
     private final AuthenticationManager authenticationManager;
@@ -101,6 +104,35 @@ public class UserService {
 
         userRepository.save(user);
         return user;
+    }
+
+    public List<UserCart> getUserCarts(UserDetailsImpl nowUser) {
+        return userCartRepository.findAllByUserId(nowUser.getId());
+    }
+
+    public boolean checkUserCart(UserDetailsImpl nowUser, Long productId) {
+        Optional<UserCart> checkUserLike = userCartRepository.findAllByUserIdAndProductId(
+                nowUser.getId(), productId);
+        if (checkUserLike.isEmpty())
+            return false;
+        return checkUserLike.get().isLikeIt();
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public boolean putInAndOutCart(UserDetailsImpl nowUser, Long productId) {
+        Optional<UserCart> userCart = userCartRepository.findByUserIdAndProductId(
+                nowUser.getId(), productId);
+        if (userCart.isEmpty()) {
+            userCartRepository.save(new UserCart(nowUser.getUser(), productId, true));
+            return true;
+        }
+        if (userCart.get().setLikeIt()) {
+            userCartRepository.save(userCart.get());
+            return true;
+        } else {
+            userCartRepository.delete(userCart.get());
+            return false;
+        }
     }
 
     public User findByUser(Long userId) {

@@ -8,8 +8,11 @@ import com.example.janghj.domain.User.UserRole;
 import com.example.janghj.service.UserService;
 import com.example.janghj.web.dto.JwtTokenDto;
 import com.example.janghj.web.dto.UserDto;
+import com.example.janghj.web.dto.basic.BasicResponse;
+import com.example.janghj.web.dto.basic.StatusCode;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -18,8 +21,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
-@RequiredArgsConstructor
+import static com.example.janghj.web.dto.basic.BasicResponse.build;
+import static com.example.janghj.web.dto.basic.StatusCode.OK;
+import static org.springframework.http.ResponseEntity.ok;
+
+@Slf4j
 @RestController
+@RequiredArgsConstructor
 public class UserController {
 
     private final JwtTokenUtil jwtTokenUtil;
@@ -68,7 +76,8 @@ public class UserController {
 
     @Operation(description = "유저 주소 변경, 로그인 필요", method = "PUT")
     @PutMapping("/user")
-    public ResponseEntity<User> updateProfile(@AuthenticationPrincipal UserDetailsImpl nowUser, @RequestBody Address address) {
+    public ResponseEntity<User> updateProfile(@AuthenticationPrincipal UserDetailsImpl nowUser,
+                                              @RequestBody Address address) {
         User user = userService.setUserAddress(nowUser, address);
         return ResponseEntity.ok().body(user);
     }
@@ -86,6 +95,43 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @Operation(description = "유저의 장바구니 정보 전체 정보 확인", method = "GET")
+    @GetMapping("/user/carts")
+    public ResponseEntity<?> getUserCarts(@AuthenticationPrincipal UserDetailsImpl nowUser) {
+        userService.getUserCarts(nowUser);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(description = "유저의 장바구니에 포함된 상태인지 확인", method = "GET")
+    @GetMapping("/user/cart/{productId}")
+    public ResponseEntity<?> getUserCart(@AuthenticationPrincipal UserDetailsImpl nowUser,
+                                         @PathVariable Long productId) {
+
+        try {
+            boolean checkUserCart = userService.checkUserCart(nowUser, productId);
+            return ok().body(build(OK, "유저의 장바구니에 담겨있는지 확인 성공", checkUserCart));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(build(StatusCode.BAD_REQUEST, e.getMessage()));
+        }
+    }
+
+    @PostMapping("/user/cart/{productId}")
+    @Operation(description = "유저의 장바구니 기능(이미 장바구니에 담겨있을 경우 장바구니에서 삭제)", method = "POST")
+    public ResponseEntity<?> putInAndOutCart(@AuthenticationPrincipal UserDetailsImpl nowUser,
+                                             @PathVariable Long productId) throws Exception {
+        try {
+            boolean checkUserCart = userService.putInAndOutCart(nowUser, productId);
+            return ok().body(build(OK, "유저의 장바구니 기능 정상 동작", checkUserCart));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(BasicResponse.build(StatusCode.BAD_REQUEST, e.getMessage()));
+        }
+    }
+
 
     @GetMapping("/user/login/kakao")
     public String kakaoLogin(String code) {

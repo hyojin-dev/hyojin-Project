@@ -51,6 +51,10 @@ public class User extends Timestamped {
     @JoinColumn(name = "user_cash_id")
     private UserCash userCash;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<UserCart> userCart = new ArrayList<>();
+
     @Builder
     public User(String username, String password, String email, UserRole role, Address address, UserCash userCash) {
         this.username = username;
@@ -78,10 +82,6 @@ public class User extends Timestamped {
 
     public void setAddress(Address address) {
         this.address = address;
-    }
-
-    public void setUserCash(UserCash userCash) {
-        this.userCash = userCash;
     }
 
     public void payForIt(int amount) {

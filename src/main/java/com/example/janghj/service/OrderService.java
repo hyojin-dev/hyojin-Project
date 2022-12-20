@@ -117,7 +117,6 @@ public class OrderService {
         for (Order order : orders) {
             totalAmount += order.getTotalAmount();
             order.getDelivery().setStatus();
-            canIBuyThis(userCash, order);
             order.setPaymentCompleted();
         }
         canIBuyThis(userCash, totalAmount);
