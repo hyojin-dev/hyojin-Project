@@ -4,6 +4,7 @@ import com.example.janghj.config.jwt.JwtTokenUtil;
 import com.example.janghj.config.security.UserDetailsImpl;
 import com.example.janghj.domain.Address;
 import com.example.janghj.domain.User.User;
+import com.example.janghj.domain.User.UserCart;
 import com.example.janghj.domain.User.UserRole;
 import com.example.janghj.service.UserService;
 import com.example.janghj.web.dto.JwtTokenDto;
@@ -20,6 +21,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static com.example.janghj.web.dto.basic.BasicResponse.build;
 import static com.example.janghj.web.dto.basic.StatusCode.OK;
@@ -99,8 +102,14 @@ public class UserController {
     @Operation(description = "유저의 장바구니 정보 전체 정보 확인", method = "GET")
     @GetMapping("/user/carts")
     public ResponseEntity<?> getUserCarts(@AuthenticationPrincipal UserDetailsImpl nowUser) {
-        userService.getUserCarts(nowUser);
-        return new ResponseEntity<>(HttpStatus.OK);
+        try {
+//            List<UserCart> userCarts = userService.getUserCarts(nowUser);
+            return ok().body(build(OK, "유저의 장바구니에 담겨있는지 확인 성공"));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(build(StatusCode.BAD_REQUEST, e.getMessage()));
+        }
     }
 
     @Operation(description = "유저의 장바구니에 포함된 상태인지 확인", method = "GET")

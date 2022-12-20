@@ -1,7 +1,7 @@
 package com.example.janghj.config.security;
 
 import com.example.janghj.domain.User.User;
-import com.example.janghj.repository.UserRepository;
+import com.example.janghj.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

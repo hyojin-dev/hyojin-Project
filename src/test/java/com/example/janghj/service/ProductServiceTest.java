@@ -2,7 +2,7 @@ package com.example.janghj.service;
 
 import com.example.janghj.domain.Category;
 import com.example.janghj.domain.Product.ProductColor;
-import com.example.janghj.repository.ProductRepository;
+import com.example.janghj.repository.product.ProductRepository;
 import com.example.janghj.web.dto.ProductDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

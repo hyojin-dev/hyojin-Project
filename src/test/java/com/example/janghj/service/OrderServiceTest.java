@@ -9,14 +9,15 @@ import com.example.janghj.domain.Product.Product;
 import com.example.janghj.domain.Product.ProductColor;
 import com.example.janghj.domain.User.User;
 import com.example.janghj.domain.User.UserCash;
-import com.example.janghj.repository.OrderRepository;
-import com.example.janghj.repository.ProductRepository;
-import com.example.janghj.repository.UserCashRepository;
-import com.example.janghj.repository.UserRepository;
+import com.example.janghj.repository.order.OrderRepository;
+import com.example.janghj.repository.product.ProductRepository;
+import com.example.janghj.repository.user.UserRepository;
+import com.example.janghj.repository.userCash.UserCashRepository;
 import com.example.janghj.web.dto.AddressDto;
 import com.example.janghj.web.dto.OrderWebDto;
 import com.example.janghj.web.dto.ProductDto;
 import com.example.janghj.web.dto.UserDto;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -80,7 +81,7 @@ class OrderServiceTest {
 
     @Test
     @DisplayName("주문하기 성공")
-    void order() throws Exception {
+    void order() throws Throwable {
         // given
 
         // when
@@ -100,7 +101,7 @@ class OrderServiceTest {
 
     @Test
     @DisplayName("주문 삭제 성공")
-    void orderCancel() throws Exception {
+    void orderCancel() throws Throwable {
         // given
         Order order = orderservice.order(userDetails, orderWebDto);
 
@@ -113,7 +114,7 @@ class OrderServiceTest {
 
     @Test
     @DisplayName("1개 상품 결재 성공")
-    void payForTheOrder() throws Exception {
+    void payForTheOrder() throws Throwable {
         // given
         Order order = orderservice.order(userDetails, orderWebDto);
 
@@ -125,13 +126,13 @@ class OrderServiceTest {
                 , order.getOrderStatus(), OrderStatus.PaymentCompleted);
         assertEquals("구매한 상품의 수량이 줄어들어야 합니다. 1000 -> 990"
                 , order.getOrderProduct().get(0).getProduct().getStockQuantity(), 990);
-        assertEquals("상품을 구매한 User 보유 금액이 변경되어야 합니다. (사용자가 보유한 금액 - 구매한 상품 가격)"
+        assertEquals("상품을 구매한 user 보유 금액이 변경되어야 합니다. (사용자가 보유한 금액 - 구매한 상품 가격)"
                 , userCash.getMoney(), 10000);
     }
 
     @Test
     @DisplayName("결재 전 전체 상품 결재하기")
-    void findByOrders() throws Exception {
+    void findByOrders() throws Throwable {
         //given
         // 결재가 완료된 주문이 존재하는 상태 보유금액
         Order order1 = orderservice.order(userDetails, orderWebDto);

@@ -8,9 +8,9 @@ import com.example.janghj.domain.User.User;
 import com.example.janghj.domain.User.UserCart;
 import com.example.janghj.domain.User.UserCash;
 import com.example.janghj.domain.User.UserRole;
-import com.example.janghj.repository.UserCartRepository;
-import com.example.janghj.repository.UserCashRepository;
-import com.example.janghj.repository.UserRepository;
+import com.example.janghj.repository.userCart.UserCartRepository;
+import com.example.janghj.repository.user.UserRepository;
+import com.example.janghj.repository.userCash.UserCashRepository;
 import com.example.janghj.web.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -106,9 +106,10 @@ public class UserService {
         return user;
     }
 
-    public List<UserCart> getUserCarts(UserDetailsImpl nowUser) {
-        return userCartRepository.findAllByUserId(nowUser.getId());
-    }
+//    public List<UserCart> getUserCarts(UserDetailsImpl nowUser) {
+//        List<UserCart> userCarts = userCartRepository.findAllByUserId(nowUser.getId());
+//
+//    }
 
     public boolean checkUserCart(UserDetailsImpl nowUser, Long productId) {
         Optional<UserCart> checkUserLike = userCartRepository.findAllByUserIdAndProductId(

@@ -7,10 +7,10 @@ import com.example.janghj.domain.Order;
 import com.example.janghj.domain.Product.Product;
 import com.example.janghj.domain.Product.ProductColor;
 import com.example.janghj.domain.User.User;
-import com.example.janghj.repository.OrderRepository;
-import com.example.janghj.repository.ProductRepository;
-import com.example.janghj.repository.UserRepository;
-import com.example.janghj.repository.UserRepositoryImpl;
+import com.example.janghj.repository.order.OrderRepository;
+import com.example.janghj.repository.product.ProductRepository;
+import com.example.janghj.repository.user.UserRepository;
+import com.example.janghj.repository.user.UserRepositoryImpl;
 import com.example.janghj.repository.dto.UserOrderDto;
 import com.example.janghj.repository.dto.UserOrderSearchDto;
 import com.example.janghj.service.OrderService;
@@ -131,7 +131,7 @@ public class QueryDslUserOrderTest {
     }
 
     @Test
-    @DisplayName("Spring Data Page 를 이용하여 User, Order 조회 성공")
+    @DisplayName("Spring Data Page 를 이용하여 user, Order 조회 성공")
     void PageTest() {
         // given
         for (int i = 0; i < 10; i++) {

@@ -1,7 +1,7 @@
 package com.example.janghj.service;
 
 import com.example.janghj.domain.User.User;
-import com.example.janghj.repository.UserRepository;
+import com.example.janghj.repository.user.UserRepository;
 import com.example.janghj.web.dto.AddressDto;
 import com.example.janghj.web.dto.UserDto;
 import org.junit.jupiter.api.BeforeEach;

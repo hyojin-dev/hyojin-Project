@@ -6,7 +6,7 @@ import com.example.janghj.domain.Product.Pants;
 import com.example.janghj.domain.Product.Product;
 import com.example.janghj.domain.Product.Shoes;
 import com.example.janghj.domain.Product.Top;
-import com.example.janghj.repository.ProductRepository;
+import com.example.janghj.repository.product.ProductRepository;
 import com.example.janghj.web.dto.ProductDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;

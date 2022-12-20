@@ -1,7 +1,8 @@
-package com.example.janghj.repository;
+package com.example.janghj.repository.userCart;
 
 import com.example.janghj.domain.User.UserCart;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

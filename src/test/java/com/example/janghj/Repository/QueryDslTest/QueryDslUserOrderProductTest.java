@@ -7,9 +7,13 @@ import com.example.janghj.domain.Order;
 import com.example.janghj.domain.Product.Product;
 import com.example.janghj.domain.Product.ProductColor;
 import com.example.janghj.domain.User.User;
-import com.example.janghj.repository.*;
+import com.example.janghj.repository.product.ProductRepository;
+import com.example.janghj.repository.search.SearchRepositoryImpl;
+import com.example.janghj.repository.user.UserRepository;
+import com.example.janghj.repository.user.UserRepositoryImpl;
 import com.example.janghj.repository.dto.UserOrderProductDto;
 import com.example.janghj.repository.dto.UserOrderProductSearchDto;
+import com.example.janghj.repository.order.OrderRepository;
 import com.example.janghj.service.OrderService;
 import com.example.janghj.service.ProductService;
 import com.example.janghj.service.UserService;
@@ -83,7 +87,7 @@ public class QueryDslUserOrderProductTest {
     }
 
     @Test
-    @DisplayName("QueryDsl User, Order, Product 검색 성공")
+    @DisplayName("QueryDsl user, Order, Product 검색 성공")
     void PageTest() {
         // given
         // QueryDsl 동적 쿼리로 조회할 저장되는 상품
@@ -98,7 +102,7 @@ public class QueryDslUserOrderProductTest {
         List<UserOrderProductDto> userOrderProductDto = searchRepositoryImpl.SearchUserOrderProduct(userOrderProductSearchDto);
 
         // then
-        assertEquals("QueryDsl 로 찾아온 User ID와 저장된 ID 값이 같아야 한다.",
+        assertEquals("QueryDsl 로 찾아온 user ID와 저장된 ID 값이 같아야 한다.",
                 userOrderProductDto.get(0).getUser().getId(), user.getId());
         assertEquals("QueryDsl 로 찾아온 Order ID와 저장된 ID 값이 같아야 한다.",
                 userOrderProductDto.get(0).getOrder().getId(), order.getId());

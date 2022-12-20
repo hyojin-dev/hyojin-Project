@@ -6,7 +6,7 @@ import com.example.janghj.chat.dto.ChatMessageDTO;
 import com.example.janghj.chat.repository.ChatRoomRepository;
 import com.example.janghj.chat.repository.ChatUserRepository;
 import com.example.janghj.domain.User.User;
-import com.example.janghj.repository.UserRepository;
+import com.example.janghj.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
