@@ -21,7 +21,7 @@ Jmeter를 이용하여 부하테스트를 진행해보았습니다.
 
 부하 테스트 결과를 분석해 보고 기존 로직보다 나은 로직을 고민하겠습니다.
 
-![1111](https://user-images.githubusercontent.com/90826012/158407519-61dedf98-3d39-4a84-b65b-837e8e4f8daa.PNG)
-![2222](https://user-images.githubusercontent.com/90826012/158407527-faf48ddf-f85b-4e80-9bd2-93ae03b02180.PNG)
+![1](https://user-images.githubusercontent.com/90826012/208674642-7b4a3f51-e7db-4e09-88c9-4d192575a9ed.png)
+![22](https://user-images.githubusercontent.com/90826012/208674649-b3d8ed45-3d75-413b-ac86-4704df4c7550.png)
 
 API 입니다.
