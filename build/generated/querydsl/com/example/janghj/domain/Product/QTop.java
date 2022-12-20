@@ -47,6 +47,9 @@ public class QTop extends EntityPathBase<Top> {
 
     public final NumberPath<Integer> topSize = createNumber("topSize", Integer.class);
 
+    //inherited
+    public final ListPath<com.example.janghj.domain.User.UserCart, com.example.janghj.domain.User.QUserCart> userCart = _super.userCart;
+
     public QTop(String variable) {
         super(Top.class, forVariable(variable));
     }

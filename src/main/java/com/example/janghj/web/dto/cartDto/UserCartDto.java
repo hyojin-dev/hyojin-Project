@@ -6,8 +6,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class UserCartDto {
-    Long UserId;
+    Long userId;
+    String userName;
     Long productId;
     String productName;
-    boolean likeIt;
+    String productPrice;
 }

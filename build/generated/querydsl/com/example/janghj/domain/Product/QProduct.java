@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -38,6 +39,8 @@ public class QProduct extends EntityPathBase<Product> {
     public final EnumPath<ProductColor> productColor = createEnum("productColor", ProductColor.class);
 
     public final NumberPath<Integer> stockQuantity = createNumber("stockQuantity", Integer.class);
+
+    public final ListPath<com.example.janghj.domain.User.UserCart, com.example.janghj.domain.User.QUserCart> userCart = this.<com.example.janghj.domain.User.UserCart, com.example.janghj.domain.User.QUserCart>createList("userCart", com.example.janghj.domain.User.UserCart.class, com.example.janghj.domain.User.QUserCart.class, PathInits.DIRECT2);
 
     public QProduct(String variable) {
         super(Product.class, forVariable(variable));

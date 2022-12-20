@@ -21,6 +21,10 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
+    public Product testGetProduct(String productName) {
+        return productRepository.findByName(productName);
+    }
+
     public void registerProduct(ProductDto productDto) {
         /* Product 엔티티가 증가할 수록 해당 코드가 함께 증가합니다.
          * 개선되어야 할 코드 리팩토링 예정입니다.*/

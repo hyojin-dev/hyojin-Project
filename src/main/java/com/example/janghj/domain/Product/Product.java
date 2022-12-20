@@ -2,12 +2,16 @@ package com.example.janghj.domain.Product;
 
 import com.example.janghj.domain.Category;
 import com.example.janghj.domain.Timestamped;
+import com.example.janghj.domain.User.UserCart;
 import com.example.janghj.web.dto.ProductDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -34,6 +38,9 @@ public abstract class Product extends Timestamped {
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private ProductColor productColor;
+
+    @OneToMany(mappedBy = "product")
+    private List<UserCart> userCart = new ArrayList<>();
 
     public Product(String name, int price, int stockQuantity, Category category, ProductColor productColor) {
         this.name = name;

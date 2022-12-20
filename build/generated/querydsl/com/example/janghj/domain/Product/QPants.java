@@ -47,6 +47,9 @@ public class QPants extends EntityPathBase<Pants> {
     //inherited
     public final NumberPath<Integer> stockQuantity = _super.stockQuantity;
 
+    //inherited
+    public final ListPath<com.example.janghj.domain.User.UserCart, com.example.janghj.domain.User.QUserCart> userCart = _super.userCart;
+
     public QPants(String variable) {
         super(Pants.class, forVariable(variable));
     }

@@ -63,7 +63,7 @@ public class QueryDslUserOrderProductTest {
     Order order;
 
     @BeforeEach
-    void beforeEach() {
+    void beforeEach() throws Throwable {
         UserDto userDto = new UserDto("username",
                 "password",
                 "email",

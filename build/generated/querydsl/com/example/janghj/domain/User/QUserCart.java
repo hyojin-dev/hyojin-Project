@@ -34,7 +34,7 @@ public class QUserCart extends EntityPathBase<UserCart> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> modifiedAt = _super.modifiedAt;
 
-    public final NumberPath<Long> productId = createNumber("productId", Long.class);
+    public final com.example.janghj.domain.Product.QProduct product;
 
     public final QUser user;
 
@@ -56,6 +56,7 @@ public class QUserCart extends EntityPathBase<UserCart> {
 
     public QUserCart(Class<? extends UserCart> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this.product = inits.isInitialized("product") ? new com.example.janghj.domain.Product.QProduct(forProperty("product")) : null;
         this.user = inits.isInitialized("user") ? new QUser(forProperty("user"), inits.get("user")) : null;
     }
 

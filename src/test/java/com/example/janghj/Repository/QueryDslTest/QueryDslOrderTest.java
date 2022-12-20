@@ -58,7 +58,7 @@ public class QueryDslOrderTest {
     OrderWebDto orderWebDto;
 
     @BeforeEach
-    void beforeEach() {
+    void beforeEach() throws Throwable {
         this.userDto = new UserDto("username",
                 "password",
                 "email",
@@ -83,7 +83,7 @@ public class QueryDslOrderTest {
 
     @Test
     @DisplayName("QueryDsl 동적 쿼리로 조회 성공")
-    void order() throws Exception {
+    void order() throws Throwable {
         // given
         User user = userService.registerUser(userDto);
         Order order = orderservice.order(userDetails, orderWebDto);

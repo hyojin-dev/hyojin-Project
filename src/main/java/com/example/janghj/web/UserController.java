@@ -4,8 +4,9 @@ import com.example.janghj.config.jwt.JwtTokenUtil;
 import com.example.janghj.config.security.UserDetailsImpl;
 import com.example.janghj.domain.Address;
 import com.example.janghj.domain.User.User;
-import com.example.janghj.domain.User.UserCart;
 import com.example.janghj.domain.User.UserRole;
+import com.example.janghj.repository.userCart.UserCartRepositoryImpl;
+import com.example.janghj.repository.userCart.dto.UserCartDto;
 import com.example.janghj.service.UserService;
 import com.example.janghj.web.dto.JwtTokenDto;
 import com.example.janghj.web.dto.UserDto;
@@ -36,6 +37,24 @@ public class UserController {
     private final JwtTokenUtil jwtTokenUtil;
     private final UserDetailsService userDetailsService;
     private final UserService userService;
+    private final UserCartRepositoryImpl userCartRepository;
+
+    @Operation(description = "test", method = "GET")
+    @GetMapping("/test")
+    public ResponseEntity<?> tset(@AuthenticationPrincipal UserDetailsImpl nowUser) {
+        try {
+            System.out.println("===================쿼리 몇번?===================");
+            System.out.println("===================쿼리 몇번?===================");
+            List<UserCartDto> allByUserCartDto = userCartRepository.findAllByUserCartDto(nowUser.getId());
+            System.out.println("===================쿼리 종료====================");
+            System.out.println("===================쿼리 종료====================");
+            return ok().body(build(OK, "유저의 장바구니 쿼리 테스트", allByUserCartDto));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(build(StatusCode.BAD_REQUEST, e.getMessage()));
+        }
+    }
 
     @Operation(description = "회원가입 시 아이디 유효성 검사", method = "GET")
     @GetMapping("/users/signup/check")

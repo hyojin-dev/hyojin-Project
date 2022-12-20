@@ -4,6 +4,7 @@ import com.example.janghj.config.security.UserDetailsImpl;
 import com.example.janghj.config.security.kakao.KakaoOAuth2;
 import com.example.janghj.config.security.kakao.KakaoUserInfo;
 import com.example.janghj.domain.Address;
+import com.example.janghj.domain.Product.Product;
 import com.example.janghj.domain.User.User;
 import com.example.janghj.domain.User.UserCart;
 import com.example.janghj.domain.User.UserCash;
@@ -34,6 +35,7 @@ public class UserService {
     private final UserCashRepository userCashRepository;
     private final UserCartRepository userCartRepository;
 
+    private final ProductService productService;
     private final KakaoOAuth2 kakaoOAuth2;
     private final AuthenticationManager authenticationManager;
 
@@ -124,7 +126,8 @@ public class UserService {
         Optional<UserCart> userCart = userCartRepository.findByUserIdAndProductId(
                 nowUser.getId(), productId);
         if (userCart.isEmpty()) {
-            userCartRepository.save(new UserCart(nowUser.getUser(), productId, true));
+            Product product = productService.getProduct(productId);
+            userCartRepository.save(new UserCart(nowUser.getUser(), product, true));
             return true;
         }
         if (userCart.get().setLikeIt()) {

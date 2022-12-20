@@ -47,6 +47,9 @@ public class QShoes extends EntityPathBase<Shoes> {
     //inherited
     public final NumberPath<Integer> stockQuantity = _super.stockQuantity;
 
+    //inherited
+    public final ListPath<com.example.janghj.domain.User.UserCart, com.example.janghj.domain.User.QUserCart> userCart = _super.userCart;
+
     public QShoes(String variable) {
         super(Shoes.class, forVariable(variable));
     }

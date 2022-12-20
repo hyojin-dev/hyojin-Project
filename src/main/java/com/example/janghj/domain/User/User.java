@@ -51,7 +51,6 @@ public class User extends Timestamped {
     @JoinColumn(name = "user_cash_id")
     private UserCash userCash;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserCart> userCart = new ArrayList<>();
 

@@ -64,7 +64,7 @@ public class QueryDslUserOrderTest {
     OrderWebDto orderWebDto;
 
     @BeforeEach
-    void beforeEach() {
+    void beforeEach() throws Throwable {
         this.userDto = new UserDto("username",
                 "password",
                 "email",
@@ -132,7 +132,7 @@ public class QueryDslUserOrderTest {
 
     @Test
     @DisplayName("Spring Data Page 를 이용하여 user, Order 조회 성공")
-    void PageTest() {
+    void PageTest() throws Throwable {
         // given
         for (int i = 0; i < 10; i++) {
             this.order = orderservice.order(userDetails, orderWebDto);
