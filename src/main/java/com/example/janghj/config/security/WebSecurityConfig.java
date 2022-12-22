@@ -46,8 +46,28 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                인증 과정 필요 없음
 //                .antMatchers(HttpMethod.POST, "/..").permitAll()
 //                인증 과정 필요함
-//                .antMatchers(HttpMethod.GET, "/..").authenticated()
-                .antMatchers(HttpMethod.PUT, "/securityTest/**").authenticated()
+                .antMatchers(HttpMethod.PUT, "/user").authenticated()
+                .antMatchers(HttpMethod.DELETE, "/user").authenticated()
+                .antMatchers(HttpMethod.POST, "/user/cash").authenticated()
+                .antMatchers(HttpMethod.GET, "/user/cart/{productId}").authenticated()
+                .antMatchers(HttpMethod.POST, "/user/cart/{productId}").authenticated()
+                .antMatchers(HttpMethod.GET, "/user/carts").authenticated()
+
+                .antMatchers(HttpMethod.POST, "/order").authenticated()
+                .antMatchers(HttpMethod.PUT, "/order").authenticated()
+                .antMatchers(HttpMethod.GET, "/order/{orderId}").authenticated()
+                .antMatchers(HttpMethod.DELETE, "/order/{orderId}").authenticated()
+                .antMatchers(HttpMethod.GET, "/orders").authenticated()
+                .antMatchers(HttpMethod.POST, "/order/payment").authenticated()
+                .antMatchers(HttpMethod.POST, "/orders/payment").authenticated()
+
+                .antMatchers(HttpMethod.POST, "/product").authenticated()
+                .antMatchers(HttpMethod.PUT, "/product").authenticated()
+                .antMatchers(HttpMethod.DELETE, "/product/{productId}").authenticated()
+
+                .antMatchers(HttpMethod.GET, "/order/delivery").authenticated()
+                .antMatchers(HttpMethod.POST, "/order/delivery").authenticated()
+//                .antMatchers(HttpMethod.PUT, "/securityTest/**").authenticated()
 
                 // 그 외 모든 요청은 인증과정 필요
                 // .anyRequest().authenticated()
