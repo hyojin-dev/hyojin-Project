@@ -39,7 +39,7 @@ public class ProductController {
     }
 
     @Operation(description = "상품 업데이트, 로그인 필요", method = "PUT")
-    @PutMapping("/product")
+    @PutMapping("/product/{productId}")
     public Product updateProduct(@AuthenticationPrincipal UserDetailsImpl nowUser,
                                  @PathVariable Long productId,
                                  @RequestBody ProductDto productDto) {
