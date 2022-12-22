@@ -29,15 +29,17 @@ public class OrderProduct {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    private int orderPrice; //주문 가격
-    private int count; //주문 수량
+    private Long productIdValue; // 상품 Id 값
+    private int productPriceValue; // 상품 가격
+    private int purchaseQuantity; // 주문 수량
     private int amount; // 주문 전체 가격
 
-    public OrderProduct(Product product, int orderPrice, Order order, int count, int amount) {
+    public OrderProduct(Product product, Long productIdValue, int productPriceValue, Order order, int purchaseQuantity, int amount) {
         this.product = product;
-        this.orderPrice = orderPrice;
         this.order = order;
-        this.count = count;
+        this.purchaseQuantity = purchaseQuantity;
         this.amount = amount;
+        this.productIdValue = productIdValue;
+        this.productPriceValue = productPriceValue;
     }
 }

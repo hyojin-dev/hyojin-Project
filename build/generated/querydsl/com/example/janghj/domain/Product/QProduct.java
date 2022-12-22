@@ -34,6 +34,8 @@ public class QProduct extends EntityPathBase<Product> {
 
     public final StringPath name = createString("name");
 
+    public final ListPath<com.example.janghj.domain.OrderProduct, com.example.janghj.domain.QOrderProduct> orderProduct = this.<com.example.janghj.domain.OrderProduct, com.example.janghj.domain.QOrderProduct>createList("orderProduct", com.example.janghj.domain.OrderProduct.class, com.example.janghj.domain.QOrderProduct.class, PathInits.DIRECT2);
+
     public final NumberPath<Integer> price = createNumber("price", Integer.class);
 
     public final EnumPath<ProductColor> productColor = createEnum("productColor", ProductColor.class);

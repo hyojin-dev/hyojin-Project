@@ -36,6 +36,9 @@ public class QPants extends EntityPathBase<Pants> {
     //inherited
     public final StringPath name = _super.name;
 
+    //inherited
+    public final ListPath<com.example.janghj.domain.OrderProduct, com.example.janghj.domain.QOrderProduct> orderProduct = _super.orderProduct;
+
     public final NumberPath<Integer> pantsSize = createNumber("pantsSize", Integer.class);
 
     //inherited

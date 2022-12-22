@@ -2,6 +2,7 @@ package com.example.janghj.web;
 
 import com.example.janghj.config.security.UserDetailsImpl;
 import com.example.janghj.domain.Order;
+import com.example.janghj.repository.order.dto.OrderOrderProductDto;
 import com.example.janghj.service.OrderService;
 import com.example.janghj.web.dto.OrderWebDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -62,11 +63,11 @@ public class OrderController {
     @Operation(description = "나의 주문 전체 보기 , 로그인 필요", method = "GET")
     @GetMapping("/orders")
     public List<Order> findByOrders(@AuthenticationPrincipal UserDetailsImpl nowUser) {
-        return orderService.findByOrders(nowUser);
+        return orderService.findByOrders(nowUser.getId());
     }
 
     @Operation(description = "1개 주문 결재 하기, 로그인 필요,", method = "POST")
-    @PostMapping("/order/payment")
+    @PostMapping("/order/payment/{orderId}")
     public ResponseEntity<?> payForTheOrder(@AuthenticationPrincipal UserDetailsImpl nowUser,
                                             @PathVariable Long orderId) {
         try { // AOP 작업 예정

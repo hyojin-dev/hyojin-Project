@@ -108,11 +108,6 @@ public class UserService {
         return user;
     }
 
-//    public List<UserCart> getUserCarts(UserDetailsImpl nowUser) {
-//        List<UserCart> userCarts = userCartRepository.findAllByUserId(nowUser.getId());
-//
-//    }
-
     public boolean checkUserCart(UserDetailsImpl nowUser, Long productId) {
         Optional<UserCart> checkUserLike = userCartRepository.findAllByUserIdAndProductId(
                 nowUser.getId(), productId);

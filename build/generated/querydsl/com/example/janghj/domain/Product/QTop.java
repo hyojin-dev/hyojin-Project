@@ -37,6 +37,9 @@ public class QTop extends EntityPathBase<Top> {
     public final StringPath name = _super.name;
 
     //inherited
+    public final ListPath<com.example.janghj.domain.OrderProduct, com.example.janghj.domain.QOrderProduct> orderProduct = _super.orderProduct;
+
+    //inherited
     public final NumberPath<Integer> price = _super.price;
 
     //inherited

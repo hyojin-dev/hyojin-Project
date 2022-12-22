@@ -56,7 +56,7 @@ public class OrderService {
 
         product.salesQuantity(quantity);
         int amount = product.getPrice() * quantity;
-        return new OrderProduct(product, product.getPrice(), order, quantity, amount);
+        return new OrderProduct(product, productId, product.getPrice(), order, quantity, amount);
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -84,8 +84,8 @@ public class OrderService {
         return order;
     }
 
-    public List<Order> findByOrders(UserDetailsImpl nowUser) {
-        return orderRepository.findAllByUserId(nowUser.getId());
+    public List<Order> findByOrders(Long userId) {
+        return orderRepository.findAllByUserId(userId);
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -154,7 +154,7 @@ public class OrderService {
         }
         List<Product> addProduct = new ArrayList<>();
         order.getOrderProduct().forEach(orderProduct -> {
-            addProduct.add(cancelOrderProduct(orderProduct.getProduct(), orderProduct.getCount()));
+            addProduct.add(cancelOrderProduct(orderProduct.getProduct(), orderProduct.getPurchaseQuantity()));
         });
         productRepository.saveAll(addProduct);
         orderRepository.deleteById(orderId);

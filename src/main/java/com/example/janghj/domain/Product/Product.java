@@ -1,6 +1,7 @@
 package com.example.janghj.domain.Product;
 
 import com.example.janghj.domain.Category;
+import com.example.janghj.domain.OrderProduct;
 import com.example.janghj.domain.Timestamped;
 import com.example.janghj.domain.User.UserCart;
 import com.example.janghj.web.dto.ProductDto;
@@ -39,8 +40,13 @@ public abstract class Product extends Timestamped {
     @Enumerated(value = EnumType.STRING)
     private ProductColor productColor;
 
-    @OneToMany(mappedBy = "product")
     @JsonIgnore
+    @Column(nullable = false)
+    @OneToMany(mappedBy = "product")
+    private List<OrderProduct> orderProduct = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "product")
     private List<UserCart> userCart = new ArrayList<>();
 
     public Product(String name, int price, int stockQuantity, Category category, ProductColor productColor) {
