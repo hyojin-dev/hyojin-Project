@@ -40,6 +40,7 @@ public abstract class Product extends Timestamped {
     private ProductColor productColor;
 
     @OneToMany(mappedBy = "product")
+    @JsonIgnore
     private List<UserCart> userCart = new ArrayList<>();
 
     public Product(String name, int price, int stockQuantity, Category category, ProductColor productColor) {
