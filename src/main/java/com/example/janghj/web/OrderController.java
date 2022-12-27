@@ -21,7 +21,7 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @Operation(description = "주문 하기, 로그인 필요, 결재 필요", method = "POST")
+    @Operation(description = "주문 하기, 로그인 필요, 결제 필요", method = "POST")
     @PostMapping("/order")
     public ResponseEntity<?> order(@AuthenticationPrincipal UserDetailsImpl nowUser,
                                    @RequestBody OrderWebDto orderWebDto) throws Throwable {
@@ -66,14 +66,14 @@ public class OrderController {
         return orderService.findByOrders(nowUser.getId());
     }
 
-    @Operation(description = "1개 주문 결재 하기, 로그인 필요,", method = "POST")
+    @Operation(description = "1개 주문 결제 하기, 로그인 필요,", method = "POST")
     @PostMapping("/order/payment/{orderId}")
     public ResponseEntity<?> payForTheOrder(@AuthenticationPrincipal UserDetailsImpl nowUser,
                                             @PathVariable Long orderId) {
         try { // AOP 작업 예정
             orderService.payForTheOrder(nowUser, orderId);
             return new ResponseEntity<>(HttpStatus.OK);
-        } catch (ArithmeticException e) { // 결재 금액 부족
+        } catch (ArithmeticException e) { // 결제 금액 부족
             return new ResponseEntity<>(HttpStatus.PAYMENT_REQUIRED);
         } catch (AccessDeniedException e) { // 권한 없음
             throw new AccessDeniedException("해당 주문에 접근할 권한이 없습니다.");
@@ -84,20 +84,20 @@ public class OrderController {
         }
     }
 
-    @Operation(description = "전체 주문 결재 하기, 로그인 필요,", method = "POST")
+    @Operation(description = "전체 주문 결제 하기, 로그인 필요,", method = "POST")
     @PostMapping("/orders/payment")
     public void payForTheOrders(@AuthenticationPrincipal UserDetailsImpl nowUser) {
         orderService.payForTheOrders(nowUser);
     }
 
     @Operation(description = "배송 시작, 로그인 필요", method = "POST")
-    @PostMapping("/order/delivery")// 이곳은 택배 or 라이더에게 받는 요청으로 가정하고 결재가 완료된 order 의 주문상태를 변경한다.
+    @PostMapping("/order/delivery")// 이곳은 택배 or 라이더에게 받는 요청으로 가정하고 결제가 완료된 order 의 주문상태를 변경한다.
     public void orderDeliveryStart(@AuthenticationPrincipal UserDetailsImpl nowUser) {
         orderService.deliveryStart(nowUser);
     }
 
     @Operation(description = "배송 도착, 로그인 필요", method = "GET")
-    @GetMapping("/order/delivery")// 이곳은 택배 or 라이더에게 받는 요청으로 가정하고 결재가 완료된 order 의 주문상태를 변경한다.
+    @GetMapping("/order/delivery")// 이곳은 택배 or 라이더에게 받는 요청으로 가정하고 결제가 완료된 order 의 주문상태를 변경한다.
     public void orderDeliveryArrived(@AuthenticationPrincipal UserDetailsImpl nowUser) {
         orderService.orderDeliveryArrived(nowUser);
     }
